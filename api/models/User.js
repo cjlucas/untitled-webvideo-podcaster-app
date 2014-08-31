@@ -52,6 +52,22 @@ var UserModel = {
     } else {
       callback();
     }
+  },
+
+  login: function(email, password, callback) {
+    User.findOneByEmail(email)
+      .then(function(user) {
+        bcrypt.compare(password, user.password, function(err, same) {
+          if (same) {
+            callback(null, user);
+          } else {
+            callback('Incorrect password', null);
+          }
+        });
+      })
+      .fail(function(err) {
+        callback('User with email not found', null);
+      });
   }
 };
 

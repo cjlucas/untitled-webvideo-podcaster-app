@@ -5,8 +5,6 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var bcrypt = require('bcrypt');
-
 var UsersController = {
 
   create: function(req, res) {
@@ -41,16 +39,14 @@ var UsersController = {
     var email = req.param('email');
     var password = req.param('password');
 
-    User.findOneByEmail(email).exec(function(err, user) {
-      bcrypt.compare(password, user.password, function(err, same) {
-        if (same) {
-          console.log('Login Successful');
-          req.session.user = user.email;
-          res.status(200).end();
-        } else {
-          res.status(500).json({error: 'Passwords do not match.'})
-        }
-      });
+    User.login(email, password, function(err, user) {
+      if (err) {
+        res.status(500).json({error: 'Passwords do not match.'})
+      } else {
+        console.log('Login Successful');
+        req.session.user = user.email;
+        res.status(200).end();
+      }
     });
   },
 
