@@ -56,6 +56,32 @@ describe('FeedsController', function() {
         .get('/api/feeds?wrongParam=1')
         .expect(500, done);
     });
+  });
 
+  describe('#addVideos()', function() {
+    var feed;
+    before(function(done) {
+      Feed.create({feedId: 'someid'}, function(err, f) {
+        if (err) throw err;
+        feed = f;
+        done();
+      });
+    });
+
+    it('should add a video', function(done) {
+      var videos = [
+        {videoId: 'somevideoid', title: 'video title'}
+      ];
+
+      agent
+        .post('/api/feeds/' + feed.id + '/add_videos')
+        .send({videos: videos})
+        .expect(200)
+        .end(function(err, res) {
+          if(err) throw err;
+          assert.equal(res.body.videos.length, 1);
+          done();
+        });
+    });
   });
 });

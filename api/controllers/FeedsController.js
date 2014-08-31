@@ -20,7 +20,7 @@ module.exports = {
     } else if (id != null) {
       query = Feed.findOneById(id);
     } else {
-      res.status(500).json({error: 'Invalid parameters given'});
+      return res.status(500).json({error: 'Invalid parameters given'});
     }
 
     query.exec(function(err, feed){
@@ -28,6 +28,27 @@ module.exports = {
 
       res.json(feed);
     });
-  }
+  },
+
+  addVideos: function(req, res) {
+    var id = req.param('id');
+    var videos = req.param('videos');
+
+    Feed.findOneById(id).exec(function(err, feed) {
+      videos.forEach(function(video) {
+        feed.videos.add(video);
+      });
+
+      feed.save(function(err) {
+        if (err) return res.status(500).json({error: 'Error when saving feed', dbError: err});
+
+        Feed.findOneById(id)
+          .populate('videos')
+          .exec(function(err, feed) {
+            res.json(feed);
+        })
+      });
+    });
+  },
 };
 

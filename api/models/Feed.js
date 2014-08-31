@@ -49,23 +49,20 @@ function findOrCreateFeed(criteria, callback) {
 function feedForUrl(url, callback) {
   var foundMatch = false;
 
-  for (var i = 0; i < feedMatchers.length && !foundMatch; i++) {
+  for (var i = 0; i < feedMatchers.length; i++) {
     var matcher = feedMatchers[i];
     if (matcher.isMatch(url)) {
-      foundMatch = true;
 
       var criteria = {
         website: matcher.website,
         feedType: matcher.feedType,
         feedId: matcher.getFeedId()
       };
-      findOrCreateFeed(criteria, callback);
+      return findOrCreateFeed(criteria, callback);
     }
   }
 
-  if (!foundMatch) {
-    callback(null);
-  }
+  callback(null);
 }
 
 var FeedModel = {
@@ -91,6 +88,11 @@ var FeedModel = {
     users: {
       collection: 'user',
       via: 'feeds'
+    },
+
+    videos: {
+      collection: 'video',
+      via: 'feed'
     }
   },
 
