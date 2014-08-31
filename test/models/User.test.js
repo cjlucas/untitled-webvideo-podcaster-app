@@ -1,18 +1,14 @@
 var assert = require('assert');
+var helper = require('../helper');
 
 describe('UserModel', function() {
-  var Sails = require('sails');
 
   before(function(done) {
-    Sails.lift({
-    }, function(err, sails) {
-      if (err) return done(err);
-      done(err, sails);
-    });
+    helper.liftSails(done);
   });
 
   after(function(done) {
-    sails.lower(done);
+    helper.lowerSails(done);
   });
 
   describe('#create()', function() {

@@ -26,6 +26,13 @@ module.exports.routes = {
     view: 'homepage'
   },
 
-  '/login': 'UsersController.login',
-  '/logout': 'UsersController.logout'
+  'get /signup': {
+    view: 'signup'
+  },
+
+  'get /login': 'UsersController.login',
+  'post /login': 'SessionsController.login',
+  '/logout': 'UsersController.logout',
+
+  'get /api/feeds': 'FeedsController.find'
 };
