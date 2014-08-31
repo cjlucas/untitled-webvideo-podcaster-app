@@ -26,17 +26,15 @@ var UsersController = {
           .json({error: 'User with that email already exists.'});
       }
 
-      bcrypt.hash(password, 10, function(err, encryptedPassword) {
-        User.create({email: email, password: encryptedPassword})
-          .then(function(user) {
-            res.json(user);
-          })
-          .fail(function(error) {
-            console.error(error);
-            res.status(500).json({error: 'Database Error: User creation failed.'})
-          });
-      })
-    });
+      User.create({email: email, password: password})
+        .then(function(user) {
+          res.json(user);
+        })
+        .fail(function(error) {
+          console.error(error);
+          res.status(500).json({error: 'Database Error: User creation failed.'})
+        });
+    })
   },
 
   login: function(req, res) {

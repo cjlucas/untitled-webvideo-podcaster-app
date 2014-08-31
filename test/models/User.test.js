@@ -41,5 +41,14 @@ describe('UserModel', function() {
         });
     });
 
+    it('should encrypt given password', function(done) {
+      var unencryptedPassword = 'password';
+      User.create({email: 'fake.email@google.com', password: unencryptedPassword})
+        .exec(function(err, user) {
+          assert.notEqual(user.password, unencryptedPassword);
+          done();
+        });
+    });
+
   });
 });

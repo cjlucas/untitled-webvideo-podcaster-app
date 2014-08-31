@@ -5,6 +5,17 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var bcrypt = require('bcrypt');
+
+function isEncrypted(string) {
+  try {
+    bcrypt.getRounds(string);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 var UserModel = {
 
   attributes: {
@@ -29,6 +40,17 @@ var UserModel = {
       collection: 'feed',
       via: 'users',
       dominant: true
+    }
+  },
+
+  beforeCreate: function(userData, callback) {
+    if(!isEncrypted(userData.password)) {
+      bcrypt.hash(userData.password, 10, function(err, encryptedPassword) {
+        userData.password = encryptedPassword;
+        callback();
+      });
+    } else {
+      callback();
     }
   }
 };
