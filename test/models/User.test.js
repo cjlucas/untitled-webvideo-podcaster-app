@@ -51,4 +51,49 @@ describe('UserModel', function() {
     });
 
   });
+
+  describe('#login()', function() {
+    var email = 'some.email@google.com';
+    var password = 'password';
+
+    beforeEach(function(done) {
+      User.find().exec(function(err, users) {
+        var destroyedCount = 0;
+        users.forEach(function(user) {
+          user.destroy();
+          destroyedCount++;
+          if (destroyedCount === users.length) {
+            User.create({email: email, password: password})
+              .then(function(user) {
+                done();
+              }).fail(done);
+          }
+        });
+      });
+    });
+
+    it('should succeed if correct email and password given', function(done) {
+      User.login(email, password, function(err, user) {
+        assert.equal(err, null);
+        assert.ok(user);
+        done();
+      });
+    });
+
+    it('should fail if incorrect email given', function(done) {
+      User.login('wrong.email@google.com', password, function(err, user) {
+        assert.ok(err);
+        assert.equal(user, null);
+        done();
+      });
+    });
+
+    it('should fail if incorrect password given', function(done) {
+      User.login(email, 'bad.password', function(err, user) {
+        assert.ok(err);
+        assert.equal(user, null);
+        done();
+      });
+    });
+  });
 });
