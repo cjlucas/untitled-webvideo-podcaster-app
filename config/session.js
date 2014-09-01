@@ -31,9 +31,9 @@ module.exports.session = {
   *                                                                          *
   ***************************************************************************/
 
-  // cookie: {
-  //   maxAge: 24 * 60 * 60 * 1000
-  // }
+  cookie: {
+     maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+  },
 
   /***************************************************************************
   *                                                                          *
@@ -41,7 +41,7 @@ module.exports.session = {
   * session store that can be shared across multiple Sails.js servers        *
   ***************************************************************************/
 
-  // adapter: 'redis',
+  adapter: process.env.NODE_ENV == 'test' ? undefined : 'redis',
 
   /***************************************************************************
   *                                                                          *
@@ -52,12 +52,12 @@ module.exports.session = {
   *                                                                          *
   ***************************************************************************/
 
-  // host: 'localhost',
-  // port: 6379,
-  // ttl: <redis session TTL in seconds>,
-  // db: 0,
-  // pass: <redis auth password>
-  // prefix: 'sess:'
+//  host: 'localhost',
+//  port: 6379,
+//  ttl: <redis session TTL in seconds>,
+//  db: 0,
+//  pass: <redis auth password>
+  prefix: 'podcaster:sessions:'
 
 
   /***************************************************************************

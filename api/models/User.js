@@ -39,7 +39,7 @@ var UserModel = {
     feeds: {
       collection: 'feed',
       via: 'users',
-      dominant: true
+      index: true
     }
   },
 
