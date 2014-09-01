@@ -53,18 +53,10 @@ describe('UserModel', function() {
     var password = 'password';
 
     beforeEach(function(done) {
-      User.find().exec(function(err, users) {
-        var destroyedCount = 0;
-        users.forEach(function(user) {
-          user.destroy();
-          destroyedCount++;
-          if (destroyedCount === users.length) {
-            User.create({email: email, password: password})
-              .then(function(user) {
-                done();
-              }).fail(done);
-          }
-        });
+      helper.destroyAll(User, function() {
+        User.create({email: email, password: password})
+          .then(function(user) { done() })
+          .fail(function(err) { throw err });
       });
     });
 

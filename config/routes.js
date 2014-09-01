@@ -34,6 +34,7 @@ module.exports.routes = {
   'post /login': 'SessionsController.login',
   '/logout': 'UsersController.logout',
 
+  'get /api/feeds/:id': 'FeedsController.find',
   'get /api/feeds': 'FeedsController.find',
   'post /api/feeds/:id/add_videos': 'FeedsController.addVideos',
 };
