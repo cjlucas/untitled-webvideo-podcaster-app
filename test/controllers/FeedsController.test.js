@@ -1,4 +1,4 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 
 var helper = require('../helper');
 
@@ -128,6 +128,58 @@ describe('FeedsController', function() {
         .post(apiEndpoint(feed.id + 1))
         .send({videos: videos})
         .expect(404, done);
+    });
+  });
+
+  describe('#getVideoIds()', function() {
+    function apiEndPoint(feedId) {
+      return '/api/feeds/' + feedId + '/video_ids';
+    }
+
+    var feed;
+
+    beforeEach(function(done) {
+      helper.destroyAll(Feed, function() {
+        Feed.create({feedId: 'someFeedId'}, function(err, f) {
+          if (err) throw err;
+          feed = f;
+          done();
+        });
+      });
+    });
+
+    describe('when a feed has no videos', function() {
+      it('should return an empty array', function(done) {
+        console.log(feed.id);
+        agent
+          .get(apiEndPoint(feed.id))
+          .expect(200)
+          .end(function(err, res) {
+            assert.ifError(err);
+            assert.equal(res.body.length, 0);
+            done();
+          });
+      });
+    });
+
+    describe('when a feed has multiple videos', function() {
+      it('should return the video ids for all videos', function(done) {
+        var videos = [
+          {videoId: 'vid1', title: 'video #1', feed: feed.id},
+          {videoId: 'vid2', title: 'video #2', feed: feed.id},
+          {videoId: 'vid3', title: 'video #3', feed: feed.id}
+        ];
+        helper.createModels(Video, videos, function() {
+          agent
+            .get(apiEndPoint(feed.id))
+            .expect(200)
+            .end(function(err, res) {
+              assert.ifError(err);
+              assert.sameMembers(res.body, ['vid1', 'vid2', 'vid3']);
+              done();
+            });
+        });
+      });
     });
   });
 });

@@ -12,5 +12,12 @@
       <option name="processLiterals" value="false" />
       <option name="processComments" value="true" />
     </inspection_tool>
+    <inspection_tool class="TaskInspection" enabled="false" level="INFO" enabled_by_default="false">
+      <option name="suppressedTasks">
+        <set>
+          <option value="Jade" />
+        </set>
+      </option>
+    </inspection_tool>
   </profile>
 </component>

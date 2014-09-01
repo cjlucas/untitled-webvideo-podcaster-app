@@ -30,8 +30,15 @@ module.exports.policies = {
 
   UsersController: {
     '*': 'loadCurrentUser',
-    'create': [],
-    'login': []
+    create: [],
+    login: []
+  },
+
+  FeedsController: {
+    '*': ['requireIdParameter', 'requireExistingFeed'],
+    getVideoIds: ['requireIdParameter'],
+    find: [],
+    index: ['loadCurrentUser', 'requireCurrentUser']
   }
 
 

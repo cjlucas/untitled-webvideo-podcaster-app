@@ -1,4 +1,4 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 var helper = require('../helper');
 
 describe('UserModel', function() {

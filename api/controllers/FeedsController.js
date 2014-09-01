@@ -31,32 +31,44 @@ module.exports = {
   },
 
   addVideos: function(req, res) {
-    var id = req.param('id');
     var videos = req.param('videos');
 
-    Feed.findOneById(id).exec(function(err, feed) {
-      if (err || !feed) {
-        return res.status(404).json({error: 'Feed not found'});
+    videos.forEach(function(video) {
+      this.feed.videos.add(video);
+    });
+
+    this.feed.save(function(err) {
+      if (err) {
+        return res
+          .status(500)
+          .json({error: 'Error when saving feed', dbError: err});
       }
 
-      videos.forEach(function(video) {
-        feed.videos.add(video);
-      });
-
-      feed.save(function(err) {
-        if (err) {
-          return res
-            .status(500)
-            .json({error: 'Error when saving feed', dbError: err});
-        }
-
-        Feed.findOneById(id)
-          .populate('videos')
-          .exec(function(err, feed) {
-            res.json(feed);
+      Feed.findOneById(this.feed.id)
+        .populate('videos')
+        .exec(function(err, feed) {
+          res.json(feed);
         })
-      });
     });
+  },
+
+  getVideoIds: function(req, res) {
+    Feed.findOneById(req.param('id')).populate('videos')
+      .then(function(feed) {
+        if (!feed) return res.status(404).json({error: 'Feed not found'});
+
+        var videosIds = feed.videos.map(function(video) {
+          return video.videoId;
+        });
+
+        res.json(videosIds);
+
+      })
+      .fail(function(err) {
+        return res
+          .status(500)
+          .json({error: 'Error occurred during query', dbError: err});
+      });
   }
 };
 
