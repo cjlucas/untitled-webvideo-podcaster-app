@@ -6,10 +6,6 @@
  */
 
 module.exports = {
-  index: function(req, res) {
-    res.render('feeds', {user: this.currentUser} );
-  },
-
   find: function(req, res) {
     var feedId = req.param('feedId');
     var id = req.param('id');
