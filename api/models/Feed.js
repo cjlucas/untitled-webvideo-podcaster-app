@@ -65,24 +65,32 @@ function feedForUrl(url, callback) {
   callback(null);
 }
 
+function urlForFeed(feed) {
+  if (feed.site === 'youtube' && feed.feedType === 'channel') {
+    return 'https://www.youtube.com/user/' +
+      feed.feedId + '/videos';
+  }
+
+  throw new Error("Can't generate url for feed");
+}
+
 var FeedModel = {
   attributes: {
-    website: {
+    site: {
       type: 'string',
-      enum: ['youtube']
-    },
-
-    url: {
-      type: 'string'
+      enum: ['youtube'],
+      required: true
     },
 
     feedType: {
       type: 'string',
-      enum: ['channel']
+      enum: ['channel'],
+      required: true
     },
 
     feedId: {
-      type: 'string'
+      type: 'string',
+      required: true
     },
 
     users: {
@@ -93,11 +101,21 @@ var FeedModel = {
     videos: {
       collection: 'video',
       via: 'feed'
+    },
+
+    toUrl: function() {
+      return urlForFeed(this);
+    },
+
+    toJSON: function() {
+      var obj = this.toObject();
+      obj.url = this.toUrl();
+      return obj;
     }
   },
 
   fromUrl: function(url, callback) {
-    feedForUrl(url, callback);
+    return feedForUrl(url, callback);
   }
 };
 

@@ -13,6 +13,12 @@ module.exports = {
       required: true
     },
 
+    site: {
+      type: 'string',
+      required: true,
+      enum: ['youtube']
+    },
+
     title: {
       type: 'string',
       required: true
@@ -28,6 +34,11 @@ module.exports = {
 
     image: {
       type: 'string'
+    },
+
+    videoUrl: {
+      type: 'string',
+      required: true
     },
 
     feed: {

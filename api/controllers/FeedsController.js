@@ -6,6 +6,10 @@
  */
 
 module.exports = {
+
+  /**
+   * /api/feeds
+   */
   find: function(req, res) {
     var feedId = req.param('feedId');
     var id = req.param('id');
@@ -26,6 +30,9 @@ module.exports = {
     });
   },
 
+  /**
+   * /api/feeds/:id/add_videos
+   */
   addVideos: function(req, res) {
     var videos = req.param('videos');
 
@@ -48,6 +55,9 @@ module.exports = {
     });
   },
 
+  /**
+   * /api/feeds/:id/video_ids
+   */
   getVideoIds: function(req, res) {
     Feed.findOneById(req.param('id')).populate('videos')
       .then(function(feed) {
