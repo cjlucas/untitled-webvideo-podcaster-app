@@ -1,4 +1,16 @@
 extends layout
 
 block content
-    h1= user.email
+    h1= Feeds
+    h3= user.feeds.length
+    table
+        thead
+            th Feed ID
+            th Site
+            th Feed Type
+            th Links
+        each feed in (user.feeds || [])
+            tr
+                td feed.feedId
+                td feed.site
+                td feed.feedType

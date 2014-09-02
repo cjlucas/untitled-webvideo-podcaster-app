@@ -22,9 +22,7 @@
 
 module.exports.routes = {
 
-  '/': {
-    view: 'homepage'
-  },
+  'get /': 'DashboardController.index',
 
   'get /signup': {
     view: 'signup'
@@ -33,6 +31,8 @@ module.exports.routes = {
   'get /login': 'UsersController.login',
   'post /login': 'SessionsController.login',
   '/logout': 'SessionsController.logout',
+
+  '/users/add_feed': 'UsersController.addFeed',
 
   'get /api/feeds/:id': 'FeedsController.find',
   'get /api/feeds': 'FeedsController.find',

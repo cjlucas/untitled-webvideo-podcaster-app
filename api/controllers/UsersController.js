@@ -36,11 +36,13 @@ var UsersController = {
   },
 
   login: function(req, res) {
-    console.log(sails);
     res.render('login', {layout: 'layout'});
   },
 
 
+  /**
+   * POST /users/add_feed
+   */
   addFeed: function(req, res) {
     var url = req.param('url');
 
@@ -53,8 +55,8 @@ var UsersController = {
         }
         res.json(feed);
       });
-
     });
+
   }
 };
 
