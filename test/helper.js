@@ -100,6 +100,23 @@ function TestHelper() {
 
     series(callbacks, callback)
   }
+
+  this.validFeedCriteria = function() {
+    return {
+      feedId: 'someFeedId',
+      site: 'youtube',
+      feedType: 'channel'
+    };
+  }
+
+  this.validVideoCriteria = function() {
+    return {
+      videoId: 'someVideoId',
+      site: 'youtube',
+      title: 'Test Video',
+      videoUrl: 'http://example.com/path/to/video.mp4'
+    }
+  }
 }
 
 module.exports = new TestHelper();

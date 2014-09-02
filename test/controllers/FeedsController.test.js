@@ -28,8 +28,10 @@ describe('FeedsController', function() {
       });
 
       it('should return a feed when given valid feedId', function(done) {
+        var criteria = helper.validFeedCriteria();
         var feedId = '4vjao';
-        Feed.create({feedId: feedId}).exec(function(err, feed) {
+        criteria.feedId = feedId;
+        Feed.create(criteria).exec(function(err, feed) {
           agent
             .get('/api/feeds?feedId=' + feedId)
             .expect(200)
@@ -43,7 +45,7 @@ describe('FeedsController', function() {
 
     describe('when an id parameter is specified', function() {
       it('should return a feed when given valid id', function(done) {
-        Feed.create({feedId: 'someid'}).exec(function(err, feed) {
+        Feed.create(helper.validFeedCriteria()).exec(function(err, feed) {
           var id = feed.id;
           agent
             .get('/api/feeds/' + id)
@@ -73,7 +75,8 @@ describe('FeedsController', function() {
 
       it('should return all feeds', function(done) {
         var feeds = [
-          {feedId: 'feed1'}, {feedId: 'feed2'}
+          helper.validFeedCriteria(),
+          helper.validFeedCriteria()
         ];
 
         helper.createModels(Feed, feeds, function() {
@@ -98,7 +101,7 @@ describe('FeedsController', function() {
     var feed;
 
     before(function(done) {
-      Feed.create({feedId: 'someid'}, function(err, f) {
+      Feed.create(helper.validFeedCriteria(), function(err, f) {
         if (err) throw err;
         feed = f;
         done();
@@ -106,8 +109,8 @@ describe('FeedsController', function() {
     });
 
     var videos = [
-      {videoId: 'videoId1', title: 'video1'},
-      {videoId: 'videoId2', title: 'video2'}
+      helper.validVideoCriteria(),
+      helper.validVideoCriteria()
     ];
 
 
@@ -140,7 +143,7 @@ describe('FeedsController', function() {
 
     beforeEach(function(done) {
       helper.destroyAll(Feed, function() {
-        Feed.create({feedId: 'someFeedId'}, function(err, f) {
+        Feed.create(helper.validFeedCriteria(), function(err, f) {
           if (err) throw err;
           feed = f;
           done();
@@ -165,10 +168,16 @@ describe('FeedsController', function() {
     describe('when a feed has multiple videos', function() {
       it('should return the video ids for all videos', function(done) {
         var videos = [
-          {videoId: 'vid1', title: 'video #1', feed: feed.id},
-          {videoId: 'vid2', title: 'video #2', feed: feed.id},
-          {videoId: 'vid3', title: 'video #3', feed: feed.id}
+          helper.validVideoCriteria(),
+          helper.validVideoCriteria(),
+          helper.validVideoCriteria()
         ];
+
+        for (var i = 0; i < videos.length; i++) {
+          videos[i].feed = feed.id
+          videos[i].videoId = 'vid' + (i + 1);
+        }
+
         helper.createModels(Video, videos, function() {
           agent
             .get(apiEndPoint(feed.id))
