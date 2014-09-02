@@ -24,4 +24,15 @@ describe('FeedModel', function() {
       done();
     })
   });
+
+  describe('when given a url', function() {
+    it('should return a valid Feed [youtube:channel]', function(done) {
+      Feed.fromUrl('https://www.youtube.com/user/polygon', function(feed) {
+        assert.equal(feed.feedId, 'polygon');
+        assert.equal(feed.site, 'youtube');
+        assert.equal(feed.feedType, 'channel');
+        done();
+      });
+    });
+  });
 });

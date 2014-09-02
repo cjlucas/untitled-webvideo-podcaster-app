@@ -5,10 +5,10 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
-FeedMatcher = function(regex, feedIdIndex, website, feedType) {
+FeedMatcher = function(regex, feedIdIndex, site, feedType) {
   this.regex = regex;
   this.feedIdIndex = feedIdIndex;
-  this.website = website;
+  this.site = site;
   this.feedType = feedType;
   this._match = null;
 
@@ -24,8 +24,8 @@ FeedMatcher = function(regex, feedIdIndex, website, feedType) {
 
 var feedMatchers = [];
 
-function addFeedMatcher(regex, feedIdIndex, website, feedType) {
-  feedMatchers.push(new FeedMatcher(regex, feedIdIndex, website, feedType));
+function addFeedMatcher(regex, feedIdIndex, site, feedType) {
+  feedMatchers.push(new FeedMatcher(regex, feedIdIndex, site, feedType));
 }
 
 addFeedMatcher(/youtube.com\/user\/(\w*)[\?\&]?/i, 1, 'youtube', 'channel');
@@ -33,11 +33,14 @@ addFeedMatcher(/youtube.com\/user\/(\w*)[\?\&]?/i, 1, 'youtube', 'channel');
 function findOrCreateFeed(criteria, callback) {
   Feed.findOne(criteria).exec(function(error, feed) {
     if (feed == null) {
+      console.log('feed doesnt exist, creating');
       Feed.create(criteria)
         .then(function(feed) {
+          console.log('feed created');
           callback(feed);
         })
         .fail(function(error) {
+          console.log(error);
           throw error;
         });
     } else {
@@ -50,11 +53,12 @@ function feedForUrl(url, callback) {
   var foundMatch = false;
 
   for (var i = 0; i < feedMatchers.length; i++) {
+    console.log('here1');
     var matcher = feedMatchers[i];
     if (matcher.isMatch(url)) {
-
+      console.log('isMatch');
       var criteria = {
-        website: matcher.website,
+        site: matcher.site,
         feedType: matcher.feedType,
         feedId: matcher.getFeedId()
       };

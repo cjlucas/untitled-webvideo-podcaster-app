@@ -153,7 +153,6 @@ describe('FeedsController', function() {
 
     describe('when a feed has no videos', function() {
       it('should return an empty array', function(done) {
-        console.log(feed.id);
         agent
           .get(apiEndPoint(feed.id))
           .expect(200)
@@ -173,9 +172,11 @@ describe('FeedsController', function() {
           helper.validVideoCriteria()
         ];
 
+        var videoIds = ['vid1', 'vid2', 'vid3'];
+
         for (var i = 0; i < videos.length; i++) {
           videos[i].feed = feed.id
-          videos[i].videoId = 'vid' + (i + 1);
+          videos[i].videoId = videoIds[i];
         }
 
         helper.createModels(Video, videos, function() {
@@ -184,7 +185,7 @@ describe('FeedsController', function() {
             .expect(200)
             .end(function(err, res) {
               assert.ifError(err);
-              assert.sameMembers(res.body, ['vid1', 'vid2', 'vid3']);
+              assert.sameMembers(res.body, videoIds);
               done();
             });
         });

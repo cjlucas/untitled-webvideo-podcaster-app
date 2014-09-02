@@ -39,7 +39,6 @@ function TestHelper() {
         return callback(err);
       }
 
-
       setSails(sails);
       setAgent(request.agent(sails.hooks.http.app));
       callback(err);
@@ -100,6 +99,10 @@ function TestHelper() {
 
     series(callbacks, callback)
   }
+
+  /**
+   * Valid Model Criteria
+   */
 
   this.validFeedCriteria = function() {
     return {
