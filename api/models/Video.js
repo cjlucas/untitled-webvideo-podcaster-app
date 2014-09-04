@@ -24,6 +24,10 @@ module.exports = {
       required: true
     },
 
+    description: {
+      type: 'text'
+    },
+
     uploadDate: {
       type: 'date'
     },
@@ -36,8 +40,16 @@ module.exports = {
       type: 'string'
     },
 
+    width: {
+      type: 'integer'
+    },
+
+    height: {
+      type: 'integer'
+    },
+
     videoUrl: {
-      type: 'string',
+      type: 'text',
       required: true
     },
 
