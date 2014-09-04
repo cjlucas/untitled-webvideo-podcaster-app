@@ -25,7 +25,7 @@ describe('FeedModel', function() {
     })
   });
 
-  describe('when given a url', function() {
+  describe('#fromUrl()', function() {
     it('should return a valid Feed [youtube:channel]', function(done) {
       Feed.fromUrl('https://www.youtube.com/user/polygon', function(feed) {
         assert.equal(feed.feedId, 'polygon');
