@@ -1,7 +1,6 @@
 module.exports = {
   models: {
-    connection: 'localDiskDb',
-    migrate: 'drop'
+    connection: 'memoryDb'
   },
 
   log: {
