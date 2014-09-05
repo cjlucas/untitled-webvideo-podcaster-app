@@ -1,4 +1,5 @@
 var assert = require('chai').assert;
+var expect = require('chai').expect;
 
 var helper = require('../helper');
 
@@ -19,7 +20,52 @@ describe('FeedsController', function() {
   });
 
   describe('#find()', function() {
+    var feed;
+    var videoIds;
+
+    var getIds = function(models) {
+      return models.map(function(model) {
+        return model.id;
+      })
+    };
+
+    var createFeedWithVideos = function(done) {
+      var videos = [
+        helper.validVideoCriteria(),
+        helper.validVideoCriteria(),
+        helper.validVideoCriteria()
+      ];
+
+      for (var i = 0; i < videos.length; i++) {
+        videos[i].videoId = 'vid' + (i+1);
+      }
+
+      helper.series()
+        .destroyAll(Feed)
+        .destroyAll(Video)
+        .createModels(Feed, helper.validFeedCriteria())
+        .createModels(Video, videos)
+        .end(function(err, results) {
+          if (err) throw err;
+
+          // last 4 elements are from createModels calls
+          var models = results.slice(results.length - 4);
+          feed = models[0];
+          videos = models.slice(1);
+
+          videoIds = getIds(videos);
+
+          // associate videos with feed
+          for (var i = 0; i < videos.length; i++) {
+            feed.videos.add(videos[i]);
+          }
+
+          feed.save(done);
+        })
+    };
+
     describe('when a feedId parameter is specified', function() {
+      before(createFeedWithVideos);
 
       it('should return a 404 if feed not found', function(done) {
         agent
@@ -28,33 +74,31 @@ describe('FeedsController', function() {
       });
 
       it('should return a feed when given valid feedId', function(done) {
-        var criteria = helper.validFeedCriteria();
-        var feedId = '4vjao';
-        criteria.feedId = feedId;
-        Feed.create(criteria).exec(function(err, feed) {
-          agent
-            .get('/api/feeds?feedId=' + feedId)
-            .expect(200)
-            .end(function(err, res) {
-              assert.equal(res.body.feedId, feedId);
-              done();
-            });
-        });
+        var feedId = feed.feedId;
+        agent
+          .get('/api/feeds?feedId=' + feedId)
+          .expect(200)
+          .end(function(err, res) {
+            assert.equal(res.body.feedId, feedId);
+            assert.sameMembers(videoIds, getIds(res.body.videos));
+            done();
+          });
       });
     });
 
     describe('when an id parameter is specified', function() {
+      before(createFeedWithVideos);
+
       it('should return a feed when given valid id', function(done) {
-        Feed.create(helper.validFeedCriteria()).exec(function(err, feed) {
-          var id = feed.id;
-          agent
-            .get('/api/feeds/' + id)
-            .expect(200)
-            .end(function(err, res) {
-              assert.equal(res.body.id, id);
-              done();
-            });
-        });
+        var id = feed.id;
+        agent
+          .get('/api/feeds/' + id)
+          .expect(200)
+          .end(function(err, res) {
+            assert.equal(res.body.id, id);
+            assert.sameMembers(videoIds, getIds(res.body.videos));
+            done();
+          });
       });
     });
 
@@ -85,6 +129,20 @@ describe('FeedsController', function() {
             .expect(200)
             .end(function(err, res) {
               assert.equal(res.body.length, 2);
+              done();
+            });
+        });
+      });
+
+      it('should return the videos for all feeds', function(done) {
+        createFeedWithVideos(function() {
+          agent
+            .get('/api/feeds')
+            .expect(200)
+            .end(function(err, res) {
+              assert.ifError(err);
+              assert.equal(res.body.length, 1);
+              assert.sameMembers(videoIds, getIds(res.body[0].videos));
               done();
             });
         });
@@ -130,64 +188,6 @@ describe('FeedsController', function() {
         .post(apiEndpoint(feed.id + 1))
         .send({videos: videos})
         .expect(404, done);
-    });
-  });
-
-  describe('#getVideoIds()', function() {
-    function apiEndPoint(feedId) {
-      return '/api/feeds/' + feedId + '/video_ids';
-    }
-
-    var feed;
-
-    beforeEach(function(done) {
-      helper.destroyAll(Feed, function(err, models) {
-        Feed.create(helper.validFeedCriteria(), function(err, f) {
-          feed = f;
-          done(err);
-        });
-      });
-    });
-
-    describe('when a feed has no videos', function() {
-      it('should return an empty array', function(done) {
-        agent
-          .get(apiEndPoint(feed.id))
-          .expect(200)
-          .end(function(err, res) {
-            assert.ifError(err);
-            assert.equal(res.body.length, 0);
-            done();
-          });
-      });
-    });
-
-    describe('when a feed has multiple videos', function() {
-      it('should return the video ids for all videos', function(done) {
-        var videos = [
-          helper.validVideoCriteria(),
-          helper.validVideoCriteria(),
-          helper.validVideoCriteria()
-        ];
-
-        var videoIds = ['vid1', 'vid2', 'vid3'];
-
-        for (var i = 0; i < videos.length; i++) {
-          videos[i].feed = feed.id
-          videos[i].videoId = videoIds[i];
-        }
-
-        helper.createModels(Video, videos, function(err, models) {
-          agent
-            .get(apiEndPoint(feed.id))
-            .expect(200)
-            .end(function(err, res) {
-              assert.ifError(err);
-              assert.sameMembers(res.body, videoIds);
-              done();
-            });
-        });
-      });
     });
   });
 });

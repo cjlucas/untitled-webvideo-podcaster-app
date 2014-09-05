@@ -10,7 +10,18 @@ function setSails(sails) {
 }
 
 function Series() {
-  this.tasks = [];
+  /*
+    A bucket of tasks, tasks are an array of functions.
+    Each tasks producer creates it's own array of tasks.
+
+    When end() is called, the bucket is flattened into a one-dimensional
+    array of functions.
+
+    The purpose of this is to guarantee that the results
+    returned in the async.series callback are in the order in which the
+    Series method chain is called.
+   */
+  this.tasksBucket = [];
   this.numRunningTaskProducers = 0;
   this.endCallback = null; // set when end() is called
 
@@ -19,13 +30,19 @@ function Series() {
   };
 
   this.decrNumRunningTaskProducers = function() {
-    if (--this.numRunningTaskProducers == 0 && this.endCallback != null) {
+    if (--this.numRunningTaskProducers == 0
+      && this.endCallback != null) {
       this.end(this.endCallback);
     }
   };
 
+  this.newTasks = function() {
+    var i = this.tasksBucket.push([]) - 1;
+    return this.tasksBucket[i];
+  };
+
   this.then = function(func) {
-    this.tasks.push(func);
+    this.newTasks().push(func);
     return this;
   };
 
@@ -37,26 +54,35 @@ function Series() {
       return;
     }
 
-    async.series(this.tasks, callback);
+    var t = [];
+    for (var i = 0; i < this.tasksBucket.length; i++) {
+      for (var j = 0; j < this.tasksBucket[i].length; j++) {
+        t.push(this.tasksBucket[i][j]);
+      }
+    }
+
+    async.series(t, callback);
   };
 
   this.destroyAll = function(Model) {
-    this.numRunningTaskProducers++;
+    this.incrNumRunningTaskProducers();
+    var tasks = this.newTasks();
     var self = this;
+
     Model.find().exec(function(err, models) {
       if (err) throw err;
 
       var destroyModel = function(model) {
         return function(cb) {
           model.destroy(function(err) {
-            cb(err, model);
+            cb(err, "destroyed: " + model);
           });
         }
       };
 
       models.forEach(function(model) {
-        self.then(destroyModel(model));
-      });
+       this.push(destroyModel(model));
+      }, tasks);
 
       self.decrNumRunningTaskProducers();
     });
@@ -66,7 +92,8 @@ function Series() {
 
   this.createModels = function(Model, modelCriteria) {
     this.incrNumRunningTaskProducers();
-    if (typeof modelCriteria !== 'array') modelCriteria = [modelCriteria];
+    if (!Array.isArray(modelCriteria)) modelCriteria = [modelCriteria];
+    var tasks = this.newTasks();
 
     var createModel = function(criteria) {
       return function(cb) {
@@ -75,8 +102,8 @@ function Series() {
     };
 
     modelCriteria.forEach(function(criteria) {
-      this.then(createModel(criteria));
-    }, this);
+      this.push(createModel(criteria));
+    }, tasks);
 
     this.decrNumRunningTaskProducers();
     return this;

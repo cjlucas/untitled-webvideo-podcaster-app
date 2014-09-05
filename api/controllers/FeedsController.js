@@ -20,12 +20,11 @@ module.exports = {
     } else if (id != null) {
       query = Feed.findOneById(id);
     } else {
-      query = Feed.find()
+      query = Feed.find();
     }
 
-    query.exec(function(err, feed){
+    query.populate('videos').exec(function(err, feed){
       if (err || !feed) return res.status(404).end();
-
       res.json(feed);
     });
   },
@@ -53,28 +52,6 @@ module.exports = {
           res.json(feed);
         })
     });
-  },
-
-  /**
-   * /api/feeds/:id/video_ids
-   */
-  getVideoIds: function(req, res) {
-    Feed.findOneById(req.param('id')).populate('videos')
-      .then(function(feed) {
-        if (!feed) return res.status(404).json({error: 'Feed not found'});
-
-        var videosIds = feed.videos.map(function(video) {
-          return video.videoId;
-        });
-
-        res.json(videosIds);
-
-      })
-      .fail(function(err) {
-        return res
-          .status(500)
-          .json({error: 'Error occurred during query', dbError: err});
-      });
   }
 };
 

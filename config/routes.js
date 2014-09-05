@@ -37,5 +37,4 @@ module.exports.routes = {
   'get /api/feeds/:id': 'FeedsController.find',
   'get /api/feeds': 'FeedsController.find',
   'post /api/feeds/:id/add_videos': 'FeedsController.addVideos',
-  'get /api/feeds/:id/video_ids': 'FeedsController.getVideoIds'
 };
