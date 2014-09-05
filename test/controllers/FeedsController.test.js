@@ -120,9 +120,8 @@ describe('FeedsController', function() {
         .send({videos: videos})
         .expect(200)
         .end(function(err, res) {
-          if(err) throw err;
           assert.equal(res.body.videos.length, 2);
-          done();
+          done(err);
         });
     });
 
@@ -142,11 +141,10 @@ describe('FeedsController', function() {
     var feed;
 
     beforeEach(function(done) {
-      helper.destroyAll(Feed, function() {
+      helper.destroyAll(Feed, function(err, models) {
         Feed.create(helper.validFeedCriteria(), function(err, f) {
-          if (err) throw err;
           feed = f;
-          done();
+          done(err);
         });
       });
     });
@@ -179,7 +177,7 @@ describe('FeedsController', function() {
           videos[i].videoId = videoIds[i];
         }
 
-        helper.createModels(Video, videos, function() {
+        helper.createModels(Video, videos, function(err, models) {
           agent
             .get(apiEndPoint(feed.id))
             .expect(200)

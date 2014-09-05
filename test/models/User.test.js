@@ -53,11 +53,13 @@ describe('UserModel', function() {
     var password = 'password';
 
     beforeEach(function(done) {
-      helper.destroyAll(User, function() {
-        User.create({email: email, password: password})
-          .then(function(user) { done() })
-          .fail(function(err) { throw err });
-      });
+        helper.series()
+          .destroyAll(User)
+          .then(function (cb) {
+            User
+              .create({email: email, password: password})
+              .exec(cb)
+          }).end(done);
     });
 
     it('should succeed if correct email and password given', function(done) {

@@ -1,5 +1,6 @@
 var SailsApp = require('sails').Sails;
 var request = require('supertest');
+var async = require('async');
 
 function setAgent(agent) {
   module.exports.agent = agent;
@@ -8,14 +9,78 @@ function setSails(sails) {
   module.exports.sails = sails;
 }
 
-// From http://book.mixu.net/node/ch7.html
-function series(callbacks, last) {
-  function next() {
-    var callback = callbacks.shift();
-    if(callback) callback(function() { next() });
-    else last();
-  }
-  next();
+function Series() {
+  this.tasks = [];
+  this.numRunningTaskProducers = 0;
+  this.endCallback = null; // set when end() is called
+
+  this.incrNumRunningTaskProducers = function() {
+    this.numRunningTaskProducers++;
+  };
+
+  this.decrNumRunningTaskProducers = function() {
+    if (--this.numRunningTaskProducers == 0 && this.endCallback != null) {
+      this.end(this.endCallback);
+    }
+  };
+
+  this.then = function(func) {
+    this.tasks.push(func);
+    return this;
+  };
+
+  this.end = function(callback) {
+    // Don't execute series() if there are still task producers running
+    // In this case, decrNumRunningTaskProducers will call end()
+    if (this.numRunningTaskProducers > 0) {
+      this.endCallback = callback;
+      return;
+    }
+
+    async.series(this.tasks, callback);
+  };
+
+  this.destroyAll = function(Model) {
+    this.numRunningTaskProducers++;
+    var self = this;
+    Model.find().exec(function(err, models) {
+      if (err) throw err;
+
+      var destroyModel = function(model) {
+        return function(cb) {
+          model.destroy(function(err) {
+            cb(err, model);
+          });
+        }
+      };
+
+      models.forEach(function(model) {
+        self.then(destroyModel(model));
+      });
+
+      self.decrNumRunningTaskProducers();
+    });
+
+    return this;
+  };
+
+  this.createModels = function(Model, modelCriteria) {
+    this.incrNumRunningTaskProducers();
+    if (typeof modelCriteria !== 'array') modelCriteria = [modelCriteria];
+
+    var createModel = function(criteria) {
+      return function(cb) {
+        Model.create(criteria).exec(cb);
+      }
+    };
+
+    modelCriteria.forEach(function(criteria) {
+      this.then(createModel(criteria));
+    }, this);
+
+    this.decrNumRunningTaskProducers();
+    return this;
+  };
 }
 
 function TestHelper() {
@@ -55,50 +120,17 @@ function TestHelper() {
     this.sails.lower(callback);
   };
 
-  /**
-   * Destroy all models
-   *
-   * @param Model {Object} The model class
-   * @param callback {Function} Called when all objects are destroyed
-   */
-  this.destroyAll = function(Model, callback) {
-    Model.find().exec(function(err, models) {
-      if (err) throw err;
-
-      var destroyedCount = 0;
-      var callbacks = [];
-      models.forEach(function(model) {
-        callbacks.push(function(next) {
-          model.destroy(function(err, status) {
-            next();
-          })
-        });
-      });
-
-      series(callbacks, callback);
-    });
+  this.series = function() {
+    return new Series();
   };
 
-  /**
-   * Creates multiple models
-   *
-   * @param Model {Object} The model class
-   * @param modelCriteria {Array} An array of model criteria
-   * @param callback {Function} Called when all objects are created
-   */
+  this.destroyAll = function(Model, callback) {
+    new Series().destroyAll(Model).end(callback);
+  };
+
   this.createModels = function(Model, modelCriteria, callback) {
-    var callbacks = [];
-
-    modelCriteria.forEach(function(criteria) {
-      var create = function(next) {
-        Model.create(criteria).exec(function(err, model) { next() });
-      };
-
-      callbacks.push(create);
-    });
-
-    series(callbacks, callback)
-  }
+    new Series().createModels(Model, modelCriteria).end(callback);
+  };
 
   /**
    * Valid Model Criteria

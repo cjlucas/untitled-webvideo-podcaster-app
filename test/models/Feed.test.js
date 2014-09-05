@@ -11,7 +11,9 @@ describe('FeedModel', function() {
   });
 
   beforeEach(function(done) {
-    helper.destroyAll(Feed, done);
+    helper.series()
+      .destroyAll(Feed)
+      .end(done);
   });
 
   it('should return a valid feed url', function(done) {
