@@ -36,6 +36,7 @@ module.exports = {
     var videos = req.param('videos');
 
     videos.forEach(function(video) {
+      video.site = this.feed.site;
       this.feed.videos.add(video);
     });
 
