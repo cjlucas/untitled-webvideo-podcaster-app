@@ -3,7 +3,7 @@ extends layout
 block content
     h1= Feeds
     h3= user.feeds.length
-    form(method='POST', action='/users/add_feed')
+    form(method='POST', action='/add_feed')
         input(type='text' name='url')
         button(type='submit') Add Feed
     table

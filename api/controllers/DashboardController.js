@@ -13,6 +13,16 @@ module.exports = {
       .exec(function(err, user) {
         res.render('feeds', {user: user});
       });
+   },
+
+  /**
+   * POST /add_feed
+   */
+  addFeed: function(req, res) {
+    var url = req.param('url');
+    res.redirect('/api/users/'
+      + this.currentUser.id
+      + '/add_feed?url=' + url);
   }
 };
 

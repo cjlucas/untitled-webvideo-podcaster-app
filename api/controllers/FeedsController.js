@@ -55,7 +55,6 @@ module.exports = {
     });
   },
 
-
   /**
    * /api/feeds/:id/refresh
    */

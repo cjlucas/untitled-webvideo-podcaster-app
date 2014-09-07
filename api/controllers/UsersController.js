@@ -35,14 +35,11 @@ var UsersController = {
     })
   },
 
-  login: function(req, res) {
-    res.render('login', {layout: 'layout'});
-  },
-
   /**
-   * POST /users/add_feed
+   * /api/users/:id/add_feed
    */
   addFeed: function(req, res) {
+    var userId = req.param('id');
     var url = req.param('url');
 
     Feed.fromUrl(url, function onFeedLoad(feed) {
@@ -50,16 +47,26 @@ var UsersController = {
         return res.status(500).json({error: 'Invalid feed url'});
       }
 
-      this.currentUser.feeds.add(feed.id);
-
-      this.currentUser.save(function(err) {
-        if (err) {
-          res.status(500).json({error: 'User already has this feed.'})
-        }
-        res.json(feed);
-      });
+      User.findOneById(userId)
+        .then(function(user) {
+          var saveUser = function() {
+            user.save(function(err) {
+              if (err) res.status(500).json({dbError: err});
+              res.status(200).end();
+            });
+          };
+          user.feeds.add(feed);
+          saveUser();
+        })
+        .fail(function(err) {
+          res.status(500).json({dbError: err});
+        });
     });
 
+  },
+
+  login: function(req, res) {
+    res.render('login', {layout: 'layout'});
   }
 };
 
