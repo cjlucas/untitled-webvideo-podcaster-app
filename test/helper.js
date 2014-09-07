@@ -163,13 +163,20 @@ function TestHelper() {
    * Valid Model Criteria
    */
 
+  this.validUserCriteria = function() {
+    return {
+      email: 'fake.email@google.com',
+      role: 'user'
+    }
+  };
+
   this.validFeedCriteria = function() {
     return {
       feedId: 'someFeedId',
       site: 'youtube',
       feedType: 'channel'
     };
-  }
+  };
 
   this.validVideoCriteria = function() {
     return {
@@ -178,7 +185,7 @@ function TestHelper() {
       title: 'Test Video',
       videoUrl: 'http://example.com/path/to/video.mp4'
     }
-  }
+  };
 }
 
 module.exports = new TestHelper();
