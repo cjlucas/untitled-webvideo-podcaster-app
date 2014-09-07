@@ -13,7 +13,7 @@ module.exports = {
 
     User.login(email, password, function(err, user) {
       if (err) {
-        res.status(500).json({error: 'Passwords do not match.'})
+        res.status(500).json({error: err})
       } else {
         req.session.user = user.email;
         res.redirect('/');

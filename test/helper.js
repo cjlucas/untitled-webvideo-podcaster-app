@@ -147,6 +147,22 @@ function TestHelper() {
     this.sails.lower(callback);
   };
 
+  this.login = function(email, password, agent, callback) {
+    agent
+      .post('/login')
+      .send({email: email, password: password})
+      .end(function(err, res) {
+        agent.saveCookies(res);
+        callback(err);
+      })
+  };
+
+  this.logout = function(agent, callback) {
+    agent
+      .post('/logout')
+      .end(callback);
+  };
+
   this.series = function() {
     return new Series();
   };
@@ -166,8 +182,16 @@ function TestHelper() {
   this.validUserCriteria = function() {
     return {
       email: 'fake.email@google.com',
+      password: 'pass123',
       role: 'user'
     }
+  };
+
+  this.validAdminCriteria = function() {
+    var admin = this.validUserCriteria();
+    email: 'fake.admin@google.com';
+    admin.role = 'admin';
+    return admin;
   };
 
   this.validFeedCriteria = function() {

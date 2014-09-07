@@ -21,7 +21,6 @@ module.exports = function(req, res, next) {
           .status(500)
           .json({error: 'Error when verifying api permissions', dbError: err});
       } else if (feed.users.length == 0) {
-        console.log('here');
         res.status(403).send('Permission Denied');
       } else {
         next();

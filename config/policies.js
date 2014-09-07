@@ -45,6 +45,14 @@ module.exports.policies = {
       'verifyFeedApiPermissions'
     ],
     find: [],
-    addVideos: ['loadCurrentUser', 'requireAdmin']
+
+    // Admin Only
+    addVideos: [
+      'loadCurrentUser',
+      'requireAdmin',
+      'requireIdParameter',
+      'requireExistingFeed',
+      'verifyFeedApiPermissions'
+    ]
   }
 };

@@ -157,13 +157,21 @@ describe('FeedsController', function() {
     }
 
     var feed;
+    var admin = helper.validAdminCriteria();
 
     before(function(done) {
-      Feed.create(helper.validFeedCriteria(), function(err, f) {
-        if (err) throw err;
-        feed = f;
-        done();
-      });
+      var adminPass = admin.password;
+
+      helper.series()
+        .destroyAll(User)
+        .destroyAll(Feed)
+        .createModels(User, admin)
+        .createModels(Feed, helper.validFeedCriteria())
+        .end(function(err, results) {
+          if (err) return done(err);
+          feed = results.slice(-1)[0];
+          helper.login(admin.email, adminPass, agent, done);
+        });
     });
 
     var videos = [
@@ -171,15 +179,19 @@ describe('FeedsController', function() {
       helper.validVideoCriteria()
     ];
 
-
     it('should add videos to a feed', function(done) {
       agent
         .post(apiEndpoint(feed.id))
         .send({videos: videos})
         .expect(200)
         .end(function(err, res) {
-          assert.equal(res.body.videos.length, 2);
-          done(err);
+          assert.ifError(err);
+          Feed.findOneById(feed.id).populate('videos')
+            .exec(function(err, feed) {
+              assert.ifError(err);
+              expect(feed.videos).to.have.length(2);
+              done();
+            });
         });
     });
 
