@@ -152,15 +152,21 @@ function TestHelper() {
       .post('/login')
       .send({email: email, password: password})
       .end(function(err, res) {
+        if (!err && res.statusCode != 302) {
+          err = new Error(res.body.error);
+        }
         agent.saveCookies(res);
-        callback(err);
+        callback(err, agent);
       })
   };
 
   this.logout = function(agent, callback) {
     agent
       .post('/logout')
-      .end(callback);
+      .end(function(err, res) {
+        agent.saveCookies(res);
+        callback(err);
+      });
   };
 
   this.series = function() {
@@ -189,7 +195,7 @@ function TestHelper() {
 
   this.validAdminCriteria = function() {
     var admin = this.validUserCriteria();
-    email: 'fake.admin@google.com';
+    admin.email = 'fake.admin@google.com';
     admin.role = 'admin';
     return admin;
   };

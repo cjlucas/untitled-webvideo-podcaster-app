@@ -16,6 +16,35 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.policies.html
  */
 
+function FeedsControllerPolicies() {
+  // requires a feed, any user is allowed. User must have access to feed.
+  function anyUserPolicyChain() {
+    return [
+      'loadCurrentUser',
+      'requireCurrentUser',
+      'requireIdParameter',
+      'requireExistingFeed',
+      'verifyFeedApiPermissions'
+    ];
+  }
+
+  // requires a feed, requires current user to be an admin.
+  function adminsOnlyPolicyChain() {
+    return [
+      'loadCurrentUser',
+      'requireAdmin',
+      'requireIdParameter',
+      'requireExistingFeed',
+      'verifyFeedApiPermissions'
+    ];
+  }
+
+  return {
+    '*': anyUserPolicyChain(),
+    addVideos: adminsOnlyPolicyChain()
+  }
+}
+
 
 module.exports.policies = {
 
@@ -36,23 +65,5 @@ module.exports.policies = {
     login: []
   },
 
-  FeedsController: {
-    '*': [
-      'loadCurrentUser',
-      'requireCurrentUser',
-      'requireIdParameter',
-      'requireExistingFeed',
-      'verifyFeedApiPermissions'
-    ],
-    find: [],
-
-    // Admin Only
-    addVideos: [
-      'loadCurrentUser',
-      'requireAdmin',
-      'requireIdParameter',
-      'requireExistingFeed',
-      'verifyFeedApiPermissions'
-    ]
-  }
+  FeedsController: FeedsControllerPolicies()
 };

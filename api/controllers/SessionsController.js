@@ -13,6 +13,7 @@ module.exports = {
 
     User.login(email, password, function(err, user) {
       if (err) {
+        // TODO: status should be 403
         res.status(500).json({error: err})
       } else {
         req.session.user = user.email;

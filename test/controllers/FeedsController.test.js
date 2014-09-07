@@ -174,6 +174,10 @@ describe('FeedsController', function() {
         });
     });
 
+    after(function(done) {
+      helper.logout(agent, done);
+    });
+
     var videos = [
       helper.validVideoCriteria(),
       helper.validVideoCriteria()
