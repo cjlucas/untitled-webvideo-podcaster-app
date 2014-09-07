@@ -39,7 +39,6 @@ var UsersController = {
     res.render('login', {layout: 'layout'});
   },
 
-
   /**
    * POST /users/add_feed
    */
@@ -47,6 +46,10 @@ var UsersController = {
     var url = req.param('url');
 
     Feed.fromUrl(url, function onFeedLoad(feed) {
+      if (feed == null) {
+        return res.status(500).json({error: 'Invalid feed url'});
+      }
+
       this.currentUser.feeds.add(feed.id);
 
       this.currentUser.save(function(err) {
@@ -61,4 +64,3 @@ var UsersController = {
 };
 
 module.exports = UsersController;
-
