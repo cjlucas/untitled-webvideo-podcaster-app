@@ -8,7 +8,7 @@
 module.exports = {
   index: function(req, res) {
     User
-      .findOneById(this.currentUser.id)
+      .findOneById(req.currentUser.id)
       .populate('feeds')
       .exec(function(err, user) {
         res.render('feeds', {user: user});
@@ -21,7 +21,7 @@ module.exports = {
   addFeed: function(req, res) {
     var url = req.param('url');
     res.redirect('/api/users/'
-      + this.currentUser.id
+      + req.currentUser.id
       + '/add_feed?url=' + url);
   }
 };

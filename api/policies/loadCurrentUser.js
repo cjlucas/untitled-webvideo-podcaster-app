@@ -4,7 +4,7 @@ module.exports = function(req, res, next) {
   } else {
     User.findOneByEmail(req.session.user)
       .then(function(user) {
-        this.currentUser = user;
+        req.currentUser = user;
         return next();
       });
   }

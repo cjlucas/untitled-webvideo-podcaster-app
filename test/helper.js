@@ -2,9 +2,6 @@ var SailsApp = require('sails').Sails;
 var request = require('supertest');
 var async = require('async');
 
-function setAgent(agent) {
-  module.exports.agent = agent;
-}
 function setSails(sails) {
   module.exports.sails = sails;
 }
@@ -132,8 +129,7 @@ function TestHelper() {
       }
 
       setSails(sails);
-      setAgent(request.agent(sails.hooks.http.app));
-      callback(err);
+      callback(err, sails);
     });
   };
 
@@ -147,6 +143,10 @@ function TestHelper() {
     this.sails.lower(callback);
   };
 
+  this.getAgent = function(sails) {
+    return new request.agent(sails.hooks.http.app);
+  };
+
   this.login = function(email, password, agent, callback) {
     agent
       .post('/login')
@@ -158,6 +158,18 @@ function TestHelper() {
         agent.saveCookies(res);
         callback(err, agent);
       })
+  };
+
+  this.loginWithAdminAuthority = function(agent, callback) {
+    var admin = this.validAdminCriteria();
+    admin.email = 'loginWithAdminAuthority@gmail.com';
+    var adminPass = admin.password;
+
+    var self = this;
+    this.createModels(User, admin, function(err, results) {
+      if (err) return callback(err);
+      self.login(admin.email, adminPass, agent, callback);
+    });
   };
 
   this.logout = function(agent, callback) {

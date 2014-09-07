@@ -12,8 +12,8 @@ describe('FeedsControllerPolicies', function() {
   var adminPass;
 
   before(function(done) {
-    helper.liftSails(function() {
-      agent = helper.agent;
+    helper.liftSails(function(err, sails) {
+      agent = helper.getAgent(sails);
 
       // plain text passwords are encrypted on create
       user = helper.validUserCriteria();
@@ -34,7 +34,7 @@ describe('FeedsControllerPolicies', function() {
           feed = results[results.length - 1];
           done();
         });
-    })
+    });
 
   });
 
@@ -59,6 +59,10 @@ describe('FeedsControllerPolicies', function() {
   }
 
   describe('when not logged in', function() {
+    beforeEach(function(done) {
+      helper.logout(agent, done);
+    });
+
     describe('when attempting to access an admin-only api', function() {
       it('should disallow access', function(done) {
         adminOnlyApiRequest().expect(403, done);

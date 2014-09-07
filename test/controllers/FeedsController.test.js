@@ -7,10 +7,11 @@ describe('FeedsController', function() {
   var agent;
 
   before(function(done) {
-    helper.liftSails(function() {
-      agent = helper.agent;
-      done();
-    })
+    helper.liftSails(function(err, sails) {
+      agent = helper.getAgent(sails);
+      // allow full access to api
+      helper.loginWithAdminAuthority(agent, done);
+    });
 
   });
 
@@ -70,7 +71,8 @@ describe('FeedsController', function() {
       it('should return a 404 if feed not found', function(done) {
         agent
           .get('/api/feeds?feedId=fakeId')
-          .expect(404, done);
+          .expect(404)
+          .end(function(err, res) { console.log(res.body); done()});
       });
 
       it('should return a feed when given valid feedId', function(done) {
@@ -157,25 +159,16 @@ describe('FeedsController', function() {
     }
 
     var feed;
-    var admin = helper.validAdminCriteria();
 
     before(function(done) {
-      var adminPass = admin.password;
-
       helper.series()
-        .destroyAll(User)
         .destroyAll(Feed)
-        .createModels(User, admin)
         .createModels(Feed, helper.validFeedCriteria())
         .end(function(err, results) {
           if (err) return done(err);
           feed = results.slice(-1)[0];
-          helper.login(admin.email, adminPass, agent, done);
+          done();
         });
-    });
-
-    after(function(done) {
-      helper.logout(agent, done);
     });
 
     var videos = [

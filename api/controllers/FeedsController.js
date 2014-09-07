@@ -36,18 +36,18 @@ module.exports = {
     var videos = req.param('videos');
 
     videos.forEach(function(video) {
-      video.site = this.feed.site;
-      this.feed.videos.add(video);
+      video.site = req.feed.site;
+      req.feed.videos.add(video);
     });
 
-    this.feed.save(function(err) {
+    req.feed.save(function(err) {
       if (err) {
         return res
           .status(500)
           .json({error: 'Error when saving feed', dbError: err});
       }
 
-      Feed.findOneById(this.feed.id)
+      Feed.findOneById(req.feed.id)
         .populate('videos')
         .exec(function(err, feed) {
           res.json(feed);

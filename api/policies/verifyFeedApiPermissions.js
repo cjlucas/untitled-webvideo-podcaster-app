@@ -4,17 +4,17 @@
  * Users with role of user can only access feeds associated with user.
  * Users with role of admin can access any feed.
  *
- * @note this.currentUser and this.feed should both be available before this
+ * @note req.currentUser and req.feed should both be available before this
  * policy is run.
  */
 
 module.exports = function(req, res, next) {
-  if (this.currentUser.role === 'admin') {
+  if (req.currentUser.role === 'admin') {
     return next();
   }
 
-  Feed.findOneById(this.feed.id)
-    .populate('users', {id: this.currentUser.id})
+  Feed.findOneById(req.feed.id)
+    .populate('users', {id: req.currentUser.id})
     .exec(function(err, feed) {
       if (err) {
         res
