@@ -53,6 +53,16 @@ module.exports = {
           res.json(feed);
         })
     });
+  },
+
+
+  /**
+   * /api/feeds/:id/refresh
+   */
+
+  refresh: function(req, res) {
+    KueService.refreshFeed(feed);
+    res.status(200).end();
   }
 };
 
