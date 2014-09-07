@@ -3,14 +3,17 @@ extends layout
 block content
     h1= Feeds
     h3= user.feeds.length
+    form(method='POST', action='/users/add_feed')
+        input(type='text' name='url')
+        button(type='submit') Add Feed
     table
         thead
             th Feed ID
             th Site
             th Feed Type
             th Links
-        each feed in (user.feeds || [])
+        each feed in user.feeds
             tr
-                td feed.feedId
-                td feed.site
-                td feed.feedType
+                td= feed.feedId
+                td= feed.site
+                td= feed.feedType

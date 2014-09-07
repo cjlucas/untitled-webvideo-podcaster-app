@@ -8,7 +8,7 @@
 module.exports = {
   index: function(req, res) {
     User
-      .findById(this.currentUser.id)
+      .findOneById(this.currentUser.id)
       .populate('feeds')
       .exec(function(err, user) {
         res.render('feeds', {user: user});
