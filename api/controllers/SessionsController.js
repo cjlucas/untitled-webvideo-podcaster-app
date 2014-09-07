@@ -16,7 +16,7 @@ module.exports = {
         res.status(500).json({error: 'Passwords do not match.'})
       } else {
         req.session.user = user.email;
-        res.redirect('/feeds');
+        res.redirect('/');
       }
     });
   },
