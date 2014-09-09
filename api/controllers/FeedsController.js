@@ -45,13 +45,9 @@ module.exports = {
         return res
           .status(500)
           .json({error: 'Error when saving feed', dbError: err});
+      } else {
+        return res.status(200).end();
       }
-
-      Feed.findOneById(req.feed.id)
-        .populate('videos')
-        .exec(function(err, feed) {
-          res.json(feed);
-        })
     });
   },
 
