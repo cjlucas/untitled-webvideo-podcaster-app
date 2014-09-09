@@ -15,6 +15,21 @@
  * For more information on configuring policies, check out:
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.policies.html
  */
+function UsersControllerPolicies() {
+  function anyUserPolicyChain() {
+    return [
+      'loadCurrentUser',
+      'requireCurrentUser',
+      'verifyUserApiPermissions'
+    ]
+  }
+
+  return {
+    '*': anyUserPolicyChain(),
+    create: [],
+    login: []
+  }
+}
 
 function FeedsControllerPolicies() {
   // requires a feed, any user is allowed. User must have access to feed.
@@ -54,7 +69,6 @@ function FeedsControllerPolicies() {
   }
 }
 
-
 module.exports.policies = {
 
   /***************************************************************************
@@ -68,11 +82,6 @@ module.exports.policies = {
     index: ['loadCurrentUser', 'requireCurrentUser']
   },
 
-  UsersController: {
-    '*': ['loadCurrentUser', 'verifyUserApiPermissions'],
-    create: [],
-    login: []
-  },
-
+  UsersController: UsersControllerPolicies(),
   FeedsController: FeedsControllerPolicies()
 };

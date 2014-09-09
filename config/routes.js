@@ -33,6 +33,7 @@ module.exports.routes = {
   'post /login': 'SessionsController.login',
   '/logout': 'SessionsController.logout',
 
+  'post /api/users/create': 'UsersController.create',
   'get /api/users/:id/add_feed': 'UsersController.addFeed',
 
   'get /api/feeds/:id': 'FeedsController.find',
