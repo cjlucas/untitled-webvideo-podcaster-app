@@ -50,6 +50,7 @@ describe('UsersController', function() {
 
   describe('#addFeed()', function() {
     var user;
+    var feed;
     // we need a user in the db to make
     before(function(done) {
       helper.createModels(
@@ -75,23 +76,28 @@ describe('UsersController', function() {
 
     it('should succeed if a valid url given', function(done) {
       var url = 'https://www.youtube.com/user/androiddevelopers';
-      addFeedRequest(url)
-        .expect(200)
-        .end(function(err, res) {
-          assert.ifError(err);
-          // api should return the feed as the response
-          assert.equal(res.body.feedId, 'androiddevelopers');
 
-          // check if feed was actually added to user
-          User.findOneById(user.id)
-            .populate('feeds')
-            .exec(function(err, user) {
-              assert.ifError(err);
-              assert.lengthOf(user.feeds, 1);
-              assert.equal(user.feeds[0].feedId, 'androiddevelopers');
-              done();
-            });
-        });
+      var onFeedCreated = function(feed) {
+        addFeedRequest(url)
+          .expect(200)
+          .end(function(err, res) {
+            assert.ifError(err);
+            // api should return the feed as the response
+            assert.equal(res.body.feedId, feed.feedId);
+
+            // check if feed was actually added to user
+            User.findOneById(user.id)
+              .populate('feeds')
+              .exec(function(err, user) {
+                assert.ifError(err);
+                assert.lengthOf(user.feeds, 1);
+                assert.equal(user.feeds[0].feedId, feed.feedId);
+                done();
+              });
+          });
+      };
+
+      Feed.fromUrl(url, onFeedCreated);
     })
   });
 });
