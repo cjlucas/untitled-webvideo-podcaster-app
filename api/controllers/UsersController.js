@@ -11,9 +11,12 @@ var UsersController = {
     var email = req.param('email');
     var password = req.param('password');
 
-    if (email == null || password == null) {
+    if (email == null
+      || email.length == 0
+      || password == null
+      || password.length == 0) {
       return res
-        .status(500)
+        .status(400)
         .json({error: 'email or password is missing.'});
     }
 
@@ -44,7 +47,7 @@ var UsersController = {
 
     Feed.fromUrl(url, function onFeedLoad(feed) {
       if (feed == null) {
-        return res.status(500).json({error: 'Invalid feed url'});
+        return res.status(400).json({error: 'Invalid feed url'});
       }
 
       User.findOneById(userId)
@@ -52,7 +55,7 @@ var UsersController = {
           var saveUser = function() {
             user.save(function(err) {
               if (err) res.status(500).json({dbError: err});
-              res.status(200).end();
+              res.json(feed);
             });
           };
           user.feeds.add(feed);
