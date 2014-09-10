@@ -56,7 +56,7 @@ module.exports = {
    */
 
   refresh: function(req, res) {
-    KueService.refreshFeed(feed);
+    KueService.refreshFeed(req.feed);
     res.status(200).end();
   }
 };
