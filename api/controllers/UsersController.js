@@ -32,7 +32,6 @@ var UsersController = {
           res.json(user);
         })
         .fail(function(error) {
-          console.error(error);
           res.status(500).json({error: 'Database Error: User creation failed.'})
         });
     })

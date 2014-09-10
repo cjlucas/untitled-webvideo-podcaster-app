@@ -33,14 +33,11 @@ addFeedMatcher(/youtube.com\/user\/(\w*)[\?\&]?/i, 1, 'youtube', 'channel');
 function findOrCreateFeed(criteria, callback) {
   Feed.findOne(criteria).exec(function(error, feed) {
     if (feed == null) {
-      console.log('feed doesnt exist, creating');
       Feed.create(criteria)
         .then(function(feed) {
-          console.log('feed created');
           callback(feed);
         })
         .fail(function(error) {
-          console.log(error);
           throw error;
         });
     } else {
@@ -53,10 +50,8 @@ function feedForUrl(url, callback) {
   var foundMatch = false;
 
   for (var i = 0; i < feedMatchers.length; i++) {
-    console.log('here1');
     var matcher = feedMatchers[i];
     if (matcher.isMatch(url)) {
-      console.log('isMatch');
       var criteria = {
         site: matcher.site,
         feedType: matcher.feedType,

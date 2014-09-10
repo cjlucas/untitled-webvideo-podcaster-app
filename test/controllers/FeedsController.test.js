@@ -71,8 +71,7 @@ describe('FeedsController', function() {
       it('should return a 404 if feed not found', function(done) {
         agent
           .get('/api/feeds?feedId=fakeId')
-          .expect(404)
-          .end(function(err, res) { console.log(res.body); done()});
+          .expect(404, done)
       });
 
       it('should return a feed when given valid feedId', function(done) {
