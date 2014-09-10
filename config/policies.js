@@ -79,7 +79,7 @@ module.exports.policies = {
   ***************************************************************************/
 
   DashboardController: {
-    index: ['loadCurrentUser', 'requireCurrentUser']
+    '*': ['loadCurrentUser', 'requireCurrentUser']
   },
 
   UsersController: UsersControllerPolicies(),
