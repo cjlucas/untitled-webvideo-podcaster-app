@@ -46,6 +46,15 @@ describe('UserModel', function() {
         });
     });
 
+    it('should create a token', function(done) {
+      var user = helper.validUserCriteria();
+      helper.createModels(User, user, function(err, results) {
+        user = results[0];
+        assert.isNotNull(user.token);
+        done();
+      });
+    });
+
   });
 
   describe('#login()', function() {

@@ -5,6 +5,7 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var crypto = require('crypto');
 var bcrypt = require('bcrypt');
 
 function isEncrypted(string) {
@@ -14,6 +15,12 @@ function isEncrypted(string) {
   } catch (e) {
     return false;
   }
+}
+
+function createToken() {
+  var hash = crypto.createHash('sha1');
+  hash.update(Date.now().toString());
+  return hash.digest('hex');
 }
 
 var UserModel = {
@@ -36,6 +43,10 @@ var UserModel = {
       defaultsTo: 'user'
     },
 
+    token: {
+      type: 'string'
+    },
+
     feeds: {
       collection: 'feed',
       via: 'users',
@@ -44,6 +55,8 @@ var UserModel = {
   },
 
   beforeCreate: function(userData, callback) {
+    userData.token = createToken();
+
     if(!isEncrypted(userData.password)) {
       bcrypt.hash(userData.password, 10, function(err, encryptedPassword) {
         userData.password = encryptedPassword;
