@@ -29,7 +29,8 @@ module.exports = {
   /**
    * POST /api/feeds/:id/add_videos
    *
-   * Request Body: An array of Video objects
+   * Request Body:
+   *   videos: An array of Video objects
    *
    * Video definition:
    *   videoId: site-specific video id
