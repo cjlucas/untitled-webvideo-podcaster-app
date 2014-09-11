@@ -40,21 +40,13 @@ module.exports = {
       type: 'string'
     },
 
-    width: {
-      type: 'integer'
-    },
-
-    height: {
-      type: 'integer'
-    },
-
-    videoUrl: {
-      type: 'text',
-      required: true
-    },
-
     feed: {
       model: 'feed'
+    },
+
+    formats: {
+      collection: 'VideoFormat',
+      via: 'video'
     }
   }
 };

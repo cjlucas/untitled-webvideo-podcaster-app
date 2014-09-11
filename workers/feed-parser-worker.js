@@ -7,12 +7,14 @@ function FeedParserWorker(apiHost, apiPort, feedId, feedUrl) {
   this.feedId  = feedId;
   this.feedUrl = feedUrl;
   this.client = request.newClient('http://' + apiHost + ':' + apiPort);
+  this.client.setToken('a40367d1b133a8c9d185bac441484d46d804a0f0');
 
-  this.work = function() {
+  this.work = function(job, done) {
     var self = this;
 
     self.client.get('/api/feeds/' + self.feedId, function(err, res, feed) {
       var downloadArchive = [];
+      console.log(feed);
       feed.videos.forEach(function(video) {
         // the format of the youtube-dl download archive is "SITE VIDEOID"
         var line = 'youtube ' + video.videoId;
@@ -22,11 +24,13 @@ function FeedParserWorker(apiHost, apiPort, feedId, feedUrl) {
       });
 
       scrape(self.feedUrl, downloadArchive, function(videos) {
-        console.log(videos.length);
-        videos = filterVideos(videos);
+        videos.forEach(function(video) {
+          video.formats = filterFormats(video.formats);
+        });
 
         if (videos.length == 0) {
           console.log('No new videos.');
+          done();
           return;
         }
 
@@ -41,16 +45,24 @@ function FeedParserWorker(apiHost, apiPort, feedId, feedUrl) {
             function(err, res, body) {
               console.log(res.statusCode);
 //              console.log(body);
+              console.log(res.headers);
             });
           cursor += BATCH_SIZE;
         }
+        done();
       });
     });
   };
 
-  function filterVideos(videos) {
-    return videos.filter(function(video) {
-      if (video.height == null && video.width == null) {
+  function filterFormats(formats) {
+    return formats.filter(function(format) {
+      // filter audio formats
+      if (format.height == null && format.width == null) {
+        return false;
+      }
+
+      // filter tiny videos
+      if (format.height < 240) {
         return false;
       }
 
@@ -146,27 +158,33 @@ function parseYoutubeDlJSON(data) {
   var videos = [];
 
   data.forEach(function(from) {
-    var getTo = function() {
-      return {
-        videoId: from.display_id,
-        title: from.title
-      };
+    console.log('djfdiosajfoidsa');
+    var video = {
+      videoId: from.display_id,
+      title: from.title,
+      description: from.description,
+      image: from.thumbnail,
+      duration: from.duration,
+      uploadDate: new Date(
+        from.upload_date.slice(0, 4),
+        from.upload_date.slice(4, 6),
+        from.upload_date.slice(6, 8)
+      ),
+      formats: []
     };
 
     from.formats.forEach(function(format) {
-      var to = getTo();
+      this.formats.push({
+        videoUrl: format.url,
+        height: format.height,
+        width: format.width
+      });
+    }, video);
 
-      to.videoUrl = format.url;
-      to.width = format.width;
-      to.height = format.height;
-      videos.push(to);
-    });
-
+    videos.push(video);
   });
 
   return videos;
 }
 
 module.exports = FeedParserWorker;
-
-new FeedParserWorker('localhost', 1337, 2, 'https://www.youtube.com/user/CannataJeff/videos').work();

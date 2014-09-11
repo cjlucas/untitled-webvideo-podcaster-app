@@ -225,7 +225,13 @@ function TestHelper() {
       videoId: 'someVideoId',
       site: 'youtube',
       title: 'Test Video',
-      videoUrl: 'http://example.com/path/to/video.mp4'
+      formats: [
+        {
+          width: 1280,
+          height: 720,
+          videoUrl: 'http://example.com/path/to/video.mp4'
+        }
+      ]
     }
   };
 }

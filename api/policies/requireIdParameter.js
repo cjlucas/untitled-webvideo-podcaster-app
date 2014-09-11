@@ -8,7 +8,7 @@ module.exports = function(req, res, next) {
     return res
       .status(500)
       .json({error: 'Invalid parameters (missing id).'});
-  };
+  }
 
   next();
-}
+};

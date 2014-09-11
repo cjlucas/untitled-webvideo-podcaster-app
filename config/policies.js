@@ -54,18 +54,10 @@ function FeedsControllerPolicies() {
     ];
   }
 
-  // allow call to specify feedId
-  function allowFeedIdParamChain(chain) {
-    return chain.filter(function(policy) {
-      return policy !== 'requireIdParameter'
-        && policy !== 'requireExistingFeed';
-    });
-  }
-
   return {
     '*': anyUserPolicyChain(),
     addVideos: adminsOnlyPolicyChain(),
-    find: allowFeedIdParamChain(anyUserPolicyChain())
+    find: anyUserPolicyChain()
   }
 }
 

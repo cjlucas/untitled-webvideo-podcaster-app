@@ -152,16 +152,20 @@ describe('FeedsController', function() {
 
   });
 
-  describe('#addVideos()', function() {
-    function apiEndpoint(feedId) {
-      return '/api/feeds/' + feedId + '/add_videos';
+  describe.only('#addVideos()', function() {
+    function addVideosRequest(feedId, videos) {
+      return agent
+        .post('/api/feeds/' + feedId + '/add_videos')
+        .send({videos: videos})
     }
 
     var feed;
 
-    before(function(done) {
+    beforeEach(function(done) {
       helper.series()
         .destroyAll(Feed)
+        .destroyAll(Video)
+        .destroyAll(VideoFormat)
         .createModels(Feed, helper.validFeedCriteria())
         .end(function(err, results) {
           if (err) return done(err);
@@ -176,9 +180,7 @@ describe('FeedsController', function() {
     ];
 
     it('should add videos to a feed', function(done) {
-      agent
-        .post(apiEndpoint(feed.id))
-        .send({videos: videos})
+      addVideosRequest(feed.id, videos)
         .expect(200)
         .end(function(err, res) {
           assert.ifError(err);
@@ -191,11 +193,63 @@ describe('FeedsController', function() {
         });
     });
 
+    it('should save given formats', function(done) {
+      var video = helper.validVideoCriteria();
+      video.formats.push({
+        width: 1920,
+        height: 1080,
+        videoUrl: 'http://google.com/path/to/1080p.mp4'
+      });
+
+      addVideosRequest(feed.id, [video])
+        .expect(200)
+        .end(function(err, res) {
+          assert.ifError(err);
+          Feed.findOneById(feed.id).populate('videos')
+            .exec(function(err, feed) {
+              assert.ifError(err);
+              assert.lengthOf(feed.videos, 1);
+              assert.lengthOf(feed.videos[0].formats, 2);
+              done();
+            })
+        });
+    });
+
     it('should return a 404 if an invalid feed id is given', function(done) {
-      agent
-        .post(apiEndpoint(feed.id + 1))
-        .send({videos: videos})
-        .expect(404, done);
+        addVideosRequest(feed.id + 1, videos).expect(404, done);
+    });
+
+    it('should update an existing video', function(done) {
+      var video = helper.validVideoCriteria();
+      // initial add videos request should create a new video object
+      addVideosRequest(feed.id, [video])
+        .expect(200)
+        .end(function(err, res) {
+          assert.ifError(err);
+
+          video.title = 'The title changed';
+          video.formats.push({
+            width: 1920,
+            height: 1080,
+            videoUrl: 'http://google.com/path/to/1080p.mp4'
+          });
+          // second request should update the existing video
+          // with the new title and new format entry
+          addVideosRequest(feed.id, [video])
+            .expect(200)
+            .end(function(err, res) {
+              assert.ifError(err);
+              Feed.findOneById(feed.id).populate('videos')
+                .exec(function(err, feed) {
+                  assert.ifError(err);
+                  assert.lengthOf(feed.videos, 1);
+                  assert.equal(feed.videos[0].title , video.title);
+                  assert.lengthOf(feed.videos[0].formats, 2);
+                  assert.equal(feed.videos[0].formats[-1], video.formats[-1]);
+                  done();
+                });
+            });
+        })
     });
   });
 });

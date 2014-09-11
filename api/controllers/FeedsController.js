@@ -30,25 +30,62 @@ module.exports = {
   },
 
   /**
-   * /api/feeds/:id/add_videos
+   * POST /api/feeds/:id/add_videos
+   *
+   * Request Body: An array of Video objects
+   *
+   * Video definition:
+   *   videoId: site-specific video id
+   *   title
+   *   description
+   *   image: url to video image
+   *   duration: video duration in seconds
+   *   uploadDate
+   *   formats: an array of Format objects
+   *
+   * Format definition:
+   *   videoUrl: direct link to video
+   *   height
+   *   width
    */
   addVideos: function(req, res) {
     var videos = req.param('videos');
-
-    videos.forEach(function(video) {
-      video.site = req.feed.site;
-      req.feed.videos.add(video);
+    var videoIds = videos.map(function(video) {
+      return video.videoId;
     });
 
-    req.feed.save(function(err) {
-      if (err) {
-        return res
-          .status(500)
-          .json({error: 'Error when saving feed', dbError: err});
-      } else {
-        return res.status(200).end();
-      }
-    });
+    Feed.findOneById(req.feed.id).populate('videos', {videoId: videoIds})
+      .exec(function(err, feed) {
+        if (err) return res.status(500).json({dbError: err});
+
+        feed.videos.forEach(function(existingVideo) {
+          var updatedVideoCriteria =
+            getVideoWithId(existingVideo.videoId, videos);
+          // remove updated video from array
+          videos.splice(videos.indexOf(updatedVideoCriteria), 1);
+
+
+          Video.update(existingVideo.id, updatedVideoCriteria,
+            function(err, videos) {
+              if (err) return res.status(500).json({dbError: err});
+          });
+        });
+
+        videos.forEach(function(video) {
+          video.site = req.feed.site;
+          req.feed.videos.add(video);
+        });
+
+        req.feed.save(function(err) {
+          if (err) {
+            return res
+              .status(500)
+              .json({error: 'Error when saving feed', dbError: err});
+          } else {
+            return res.status(200).end();
+          }
+        });
+      });
   },
 
   /**
@@ -61,3 +98,14 @@ module.exports = {
   }
 };
 
+function getVideoWithId(videoId, videos) {
+  var video = null;
+  for(var i = 0; i < videos.length; i++) {
+    if (videos[i].videoId === videoId) {
+      video = videos[i];
+      break;
+    }
+  }
+
+  return video;
+}
