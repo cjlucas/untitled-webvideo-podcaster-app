@@ -75,6 +75,11 @@ function urlForFeed(feed) {
 
 var FeedModel = {
   attributes: {
+    guid: {
+      type: 'integer',
+      index: true
+    },
+
     site: {
       type: 'string',
       enum: ['youtube'],
@@ -111,6 +116,14 @@ var FeedModel = {
       obj.url = this.toUrl();
       return obj;
     }
+
+  },
+
+  beforeCreate: function(criteria, callback) {
+    GuidService.getGuid(Feed, function(guid) {
+      criteria.guid = guid;
+      callback();
+    });
   },
 
   fromUrl: function(url, callback) {

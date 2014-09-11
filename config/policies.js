@@ -57,7 +57,11 @@ function FeedsControllerPolicies() {
   return {
     '*': anyUserPolicyChain(),
     addVideos: adminsOnlyPolicyChain(),
-    find: anyUserPolicyChain()
+    // if current user is an admin, /api/feeds will return all existing feeds
+    find: anyUserPolicyChain().filter(function(policy) {
+      return policy !== 'requireIdParameter'
+        && policy !== 'requireExistingFeed';
+    })
   }
 }
 

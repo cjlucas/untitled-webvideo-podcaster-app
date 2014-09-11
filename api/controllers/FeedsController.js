@@ -11,14 +11,11 @@ module.exports = {
    * /api/feeds
    */
   find: function(req, res) {
-    var feedId = req.param('feedId');
-    var id = req.param('id');
+    var guid = req.param('id');
     var query;
 
-    if (feedId != null) {
-      query = Feed.findOneByFeedId(feedId);
-    } else if (id != null) {
-      query = Feed.findOneById(id);
+    if (guid != null) {
+      query = Feed.findOneByGuid(guid);
     } else {
       query = Feed.find();
     }

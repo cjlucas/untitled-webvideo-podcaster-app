@@ -1,7 +1,8 @@
 module.exports = function(req, res, next) {
   if (req.session.user != null) {
     User.findOneByEmail(req.session.user)
-      .then(function(user) {
+      .exec(function(err, user) {
+        if(err) return res.status(500).json({dbError: err});
         req.currentUser = user;
         return next();
       });

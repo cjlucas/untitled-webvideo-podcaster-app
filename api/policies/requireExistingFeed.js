@@ -6,7 +6,7 @@
  * @note This policy should be used in conjunction with requireIdParameter.
  */
 module.exports = function(req, res, next) {
-  Feed.findOneById(req.param('id'))
+  Feed.findOneByGuid(req.param('id'))
     .then(function(feed) {
       if (!feed) return res.status(404).json({error: 'Feed not found'});
       req.feed = feed;

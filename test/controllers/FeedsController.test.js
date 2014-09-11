@@ -65,38 +65,16 @@ describe('FeedsController', function() {
         })
     };
 
-    describe('when a feedId parameter is specified', function() {
-      before(createFeedWithVideos);
-
-      it('should return a 404 if feed not found', function(done) {
-        agent
-          .get('/api/feeds?feedId=fakeId')
-          .expect(404, done)
-      });
-
-      it('should return a feed when given valid feedId', function(done) {
-        var feedId = feed.feedId;
-        agent
-          .get('/api/feeds?feedId=' + feedId)
-          .expect(200)
-          .end(function(err, res) {
-            assert.equal(res.body.feedId, feedId);
-            assert.sameMembers(videoIds, getIds(res.body.videos));
-            done();
-          });
-      });
-    });
-
     describe('when an id parameter is specified', function() {
       before(createFeedWithVideos);
 
       it('should return a feed when given valid id', function(done) {
-        var id = feed.id;
+        var id = feed.guid;
         agent
           .get('/api/feeds/' + id)
           .expect(200)
           .end(function(err, res) {
-            assert.equal(res.body.id, id);
+            assert.equal(res.body.guid, id);
             assert.sameMembers(videoIds, getIds(res.body.videos));
             done();
           });
@@ -113,6 +91,7 @@ describe('FeedsController', function() {
           .get('/api/feeds')
           .expect(200)
           .end(function(err, res) {
+            assert.ifError(err);
             assert.equal(res.body.length, 0);
             done();
           });
@@ -129,6 +108,7 @@ describe('FeedsController', function() {
             .get('/api/feeds')
             .expect(200)
             .end(function(err, res) {
+              assert.ifError(err);
               assert.equal(res.body.length, 2);
               done();
             });
@@ -152,7 +132,7 @@ describe('FeedsController', function() {
 
   });
 
-  describe.only('#addVideos()', function() {
+  describe('#addVideos()', function() {
     function addVideosRequest(feedId, videos) {
       return agent
         .post('/api/feeds/' + feedId + '/add_videos')
@@ -180,7 +160,7 @@ describe('FeedsController', function() {
     ];
 
     it('should add videos to a feed', function(done) {
-      addVideosRequest(feed.id, videos)
+      addVideosRequest(feed.guid, videos)
         .expect(200)
         .end(function(err, res) {
           assert.ifError(err);
@@ -201,7 +181,7 @@ describe('FeedsController', function() {
         videoUrl: 'http://google.com/path/to/1080p.mp4'
       });
 
-      addVideosRequest(feed.id, [video])
+      addVideosRequest(feed.guid, [video])
         .expect(200)
         .end(function(err, res) {
           assert.ifError(err);
@@ -216,13 +196,13 @@ describe('FeedsController', function() {
     });
 
     it('should return a 404 if an invalid feed id is given', function(done) {
-        addVideosRequest(feed.id + 1, videos).expect(404, done);
+        addVideosRequest(feed.guid + 1, videos).expect(404, done);
     });
 
     it('should update an existing video', function(done) {
       var video = helper.validVideoCriteria();
       // initial add videos request should create a new video object
-      addVideosRequest(feed.id, [video])
+      addVideosRequest(feed.guid, [video])
         .expect(200)
         .end(function(err, res) {
           assert.ifError(err);
@@ -235,7 +215,7 @@ describe('FeedsController', function() {
           });
           // second request should update the existing video
           // with the new title and new format entry
-          addVideosRequest(feed.id, [video])
+          addVideosRequest(feed.guid, [video])
             .expect(200)
             .end(function(err, res) {
               assert.ifError(err);

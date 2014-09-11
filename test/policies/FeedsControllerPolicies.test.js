@@ -50,12 +50,12 @@ describe('FeedsControllerPolicies', function() {
     ];
 
     return agent
-      .post('/api/feeds/' + feed.id + '/add_videos')
+      .post('/api/feeds/' + feed.guid + '/add_videos')
   }
 
   function loginRequiredApiRequest(feed) {
     return agent
-      .get('/api/feeds/' + feed.id + '/refresh')
+      .get('/api/feeds/' + feed.guid + '/refresh')
   }
 
   describe('when not logged in', function() {
@@ -103,58 +103,59 @@ describe('FeedsControllerPolicies', function() {
       });
     });
 
-    describe('when logged in as a user', function() {
+    });
+
+  describe('when logged in as a user', function() {
+    before(function(done) {
+      helper.login(user.email, userPass, agent, done);
+    });
+
+    after(function(done) {
+      helper.logout(agent, done);
+    });
+
+    describe('when attempting to access an admin-only api', function() {
+      it('should disallow access', function(done) {
+        adminOnlyApiRequest().expect(403, done);
+      });
+    });
+
+    describe('when attemping to access a login-required api', function() {
+      // feed associated with user
+      var associatedFeed;
+      // feed disassociated with user
+      var disassociatedFeed;
+
       before(function(done) {
-        helper.login(user.email, userPass, agent, done);
-      });
+        // we only care about the database id, no need to modify attributes
+        var feeds = [
+          helper.validFeedCriteria(),
+          helper.validFeedCriteria()
+        ];
 
-      after(function(done) {
-        helper.logout(agent, done);
-      });
-
-      describe('when attempting to access an admin-only api', function() {
-        it('should disallow access', function(done) {
-          adminOnlyApiRequest().expect(403, done);
+        helper.createModels(Feed, feeds, function(err, results) {
+          if (err) return done(err);
+          associatedFeed = results[0];
+          disassociatedFeed = results[1];
+          user.feeds.add(associatedFeed);
+          user.save(done);
         });
       });
 
-      describe('when attemping to access a login-required api', function() {
-        // feed associated with user
-        var associatedFeed;
-        // feed disassociated with user
-        var disassociatedFeed;
+      it('should disallow access when specifying a feed disassociated with user',
+        function(done) {
+          loginRequiredApiRequest(disassociatedFeed).expect(403, done);
+        }
+      );
 
-        before(function(done) {
-          // we only care about the database id, no need to modify attributes
-          var feeds = [
-            helper.validFeedCriteria(),
-            helper.validFeedCriteria()
-          ];
-
-          helper.createModels(Feed, feeds, function(err, results) {
-            if (err) return done(err);
-            associatedFeed = results[0];
-            disassociatedFeed = results[1];
-            user.feeds.add(associatedFeed);
-            user.save(done);
+      it('should allow access when specifying feed associated with user',
+        function(done) {
+          loginRequiredApiRequest(associatedFeed).end(function(err, res) {
+            assert.notEqual(res.statusCode, 403);
+            done();
           });
         });
 
-        it('should disallow access when specifying a feed disassociated with user',
-          function(done) {
-            loginRequiredApiRequest(disassociatedFeed).expect(403, done);
-          }
-        );
-
-        it('should allow access when specifying feed associated with user',
-          function(done) {
-            loginRequiredApiRequest(associatedFeed).end(function(err, res) {
-              assert.notEqual(res.statusCode, 403);
-              done();
-            });
-        });
-
-      });
     });
   });
 });
