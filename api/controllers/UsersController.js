@@ -59,6 +59,7 @@ var UsersController = {
           };
           user.feeds.add(feed);
           saveUser();
+          KueService.refreshFeed(feed);
         })
         .fail(function(err) {
           res.status(500).json({dbError: err});
