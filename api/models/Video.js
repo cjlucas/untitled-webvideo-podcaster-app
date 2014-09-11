@@ -8,6 +8,10 @@
 module.exports = {
 
   attributes: {
+    guid: {
+      type: 'integer'
+    },
+
     videoId: {
       type: 'string',
       required: true
@@ -48,5 +52,12 @@ module.exports = {
       collection: 'VideoFormat',
       via: 'video'
     }
+  },
+
+  beforeCreate: function(criteria, callback) {
+    GuidService.getGuid(Video, function(guid) {
+      criteria.guid = guid;
+      callback();
+    });
   }
 };
