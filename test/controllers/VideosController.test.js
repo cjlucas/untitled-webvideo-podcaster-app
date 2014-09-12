@@ -1,6 +1,7 @@
 var helper = require('../helper');
 var assert = require('chai').assert;
 var expect = require('chai').expect;
+var Mitm   = require('mitm');
 
 describe('VideosController', function() {
   var agent;
@@ -105,13 +106,34 @@ describe('VideosController', function() {
     });
 
     describe('when url for requested format is not valid', function() {
+      var mitm;
+      before(function(done) {
+        // intercept the HEAD request and simulate an expired video link
+        mitm = Mitm();
+        // don't intercept connections to localhost...
+        mitm.on('connect', function(socket, opts) {
+          if (opts.host === '127.0.0.1') socket.bypass();
+        });
+        // ...otherwise return status Forbidden for any other connections
+        mitm.on('request', function(req, res) {
+          res.statusCode = 403;
+          res.end();
+        });
+
+        done();
+      });
+      after(function(done) {
+        mitm.disable();
+        done();
+      });
+
       it('should return a 503', function(done) {
         var video = helper.validVideoCriteria();
         video.formats = [
           {
             height: 720,
             width: 1280,
-            videoUrl: 'http://httpbin.org/status/403'
+            videoUrl: 'http://example.org'
           }
         ];
 
