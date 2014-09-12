@@ -1,5 +1,12 @@
 var kue = require('kue');
-var jobs = kue.createQueue(sails.config);
+var jobs = kue.createQueue({
+  prefix: sails.config.redis.prefix,
+  redis: {
+    host: sails.config.redis.host,
+    port: sails.config.redis.port,
+    auth: sails.config.redis.password
+  }
+});
 
 module.exports = {
   refreshFeed: function(feed) {
