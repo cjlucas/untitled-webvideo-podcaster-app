@@ -26,13 +26,13 @@ module.exports = {
     host: process.env['OPENSHIFT_REDIS_HOST'],
     port: process.env['OPENSHIFT_REDIS_PORT'],
     password: process.env['OPENSHIFT_REDIS_PASSWORD']
-  }
+  },
 
   /***************************************************************************
    * Set the port in the production environment to 80                        *
    ***************************************************************************/
 
-  // port: 80,
+  port: process.env['OPENSHIFT_NODEJS_PORT']
 
   /***************************************************************************
    * Set the log level in production environment to "silent"                 *
