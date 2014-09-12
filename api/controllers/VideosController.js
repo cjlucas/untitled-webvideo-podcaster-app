@@ -5,7 +5,8 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var http = require('https');
+var http = require('http');
+var https = require('https');
 var urlParser = require('url').parse;
 
 module.exports = {
@@ -83,7 +84,8 @@ module.exports = {
 function pingUrl(url, callback) {
   var opts = urlParser(url);
   opts.method = 'HEAD';
-  var req = http.request(opts, function(res) {
+  var transport = opts.protocol === 'http:' ? http : https;
+  var req = transport.request(opts, function(res) {
     return callback(res.statusCode == 200);
   });
 
