@@ -60,6 +60,14 @@ module.exports.connections = {
     database: 'podcaster'
   },
 
+  openShiftMysql: {
+    adapter: 'sails-mysql',
+    host: Process.env['OPENSHIFT_MYSQL_DB_HOST'],
+    port: Process.env['OPENSHIFT_MYSQL_DB_PORT'],
+    user: Process.env['OPENSHIFT_MYSQL_DB_USERNAME'],
+    password: Process.env['OPENSHIFT_MYSQL_DB_PASSWORD']
+  },
+
   /***************************************************************************
   *                                                                          *
   * MongoDB is the leading NoSQL database.                                   *
