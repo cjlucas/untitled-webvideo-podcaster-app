@@ -208,6 +208,7 @@ describe('FeedsController', function() {
           assert.ifError(err);
 
           video.title = 'The title changed';
+          video.formats[0].videoUrl = 'http://example.org/new_link.mp4';
           video.formats.push({
             width: 1920,
             height: 1080,
@@ -222,9 +223,14 @@ describe('FeedsController', function() {
               Feed.findOneById(feed.id).populate('videos')
                 .exec(function(err, feed) {
                   assert.ifError(err);
+                  // assert video info was updated
                   assert.lengthOf(feed.videos, 1);
                   assert.equal(feed.videos[0].title , video.title);
+
                   assert.lengthOf(feed.videos[0].formats, 2);
+                  // assert video link was updated
+                  assert.deepEqual(feed.videos[0].formats[0], video.formats[0]);
+                  // assert new format was added
                   assert.equal(feed.videos[0].formats[-1], video.formats[-1]);
                   done();
                 });

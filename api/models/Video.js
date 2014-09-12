@@ -5,6 +5,14 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+function videoToUrl(video) {
+  if (video.site === 'youtube') {
+    return 'https://youtube.com/watch?v=' + video.videoId;
+  }
+
+  throw new Error('Unknown site: ' + video.site);
+}
+
 module.exports = {
 
   attributes: {
@@ -51,6 +59,10 @@ module.exports = {
     formats: {
       collection: 'VideoFormat',
       via: 'video'
+    },
+
+    toUrl: function() {
+      return videoToUrl(this);
     }
   },
 

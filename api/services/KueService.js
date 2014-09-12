@@ -7,5 +7,16 @@ module.exports = {
     jobs
       .create('feed parser', opts)
       .save()
+  },
+
+  refreshVideo: function(video) {
+    var opts = {
+      id: video.guid,
+        url: video.toUrl()
+    };
+
+    jobs
+      .create('refresh video data', opts)
+      .save();
   }
-}
+};
