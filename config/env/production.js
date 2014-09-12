@@ -40,7 +40,8 @@ module.exports = {
     prefix: 'podcaster:sessions:',
     host: process.env['OPENSHIFT_REDIS_HOST'],
     port: process.env['OPENSHIFT_REDIS_PORT'],
-    pass: process.env['OPENSHIFT_REDIS_PASSWORD']
+    pass: process.env['OPENSHIFT_REDIS_PASSWORD'],
+    secret: process.env['OPENSHIFT_SECRET_TOKEN']
   }
 
 
