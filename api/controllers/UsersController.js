@@ -28,13 +28,11 @@ var UsersController = {
       }
 
       User.create({email: email, password: password})
-        .then(function(user) {
+        .exec(function(err, user) {
+          if (err) return res.status(500).json({dbErr: err});
           res.json(user);
-        })
-        .fail(function(error) {
-          res.status(500).json({error: 'Database Error: User creation failed.'})
         });
-    })
+    });
   },
 
   /**
