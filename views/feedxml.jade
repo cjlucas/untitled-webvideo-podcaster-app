@@ -1,0 +1,20 @@
+doctype xml
+rss(version='2.0', xmlns:itunes='http://www.itunes.com/dtds/podcast-1.0.dtd')
+    channel
+        title= '#{feed.feedId} Videos'
+        link= feed.toUrl()
+        description Placeholder
+        each video in feed.videos
+            item
+                title= video.title
+                itunes:image(href=video.image)
+                description= video.description
+                itunes:summary= video.description
+                enclosure(
+                    url='http://localhost:1337/videos/#{video.guid}/download?maxHeight=720',
+                    type='video/mp4'
+                    length=video.duration
+                )
+
+                pubDate= video.uploadDate.toUTCString()
+

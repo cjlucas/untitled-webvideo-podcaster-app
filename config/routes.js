@@ -24,6 +24,7 @@ module.exports.routes = {
 
   'get /': 'DashboardController.index',
   'post /add_feed': 'DashboardController.addFeed',
+  'get /feed/:id': 'DashboardController.feed',
 
   'get /signup': {
     view: 'signup'

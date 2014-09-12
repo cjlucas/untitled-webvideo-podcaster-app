@@ -5,7 +5,7 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var http = require('http');
+var http = require('https');
 var urlParser = require('url').parse;
 
 module.exports = {

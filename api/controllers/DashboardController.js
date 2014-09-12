@@ -23,6 +23,19 @@ module.exports = {
     res.redirect('/api/users/'
       + req.currentUser.id
       + '/add_feed?url=' + url);
+  },
+
+  /**
+   * GET /feed/:id
+   */
+
+  feed: function(req, res) {
+    Feed.findOneByGuid(req.param('id')).populate('videos').exec(function(err, feed) {
+      if(err) return res.status(500).json({dbError: err});
+      if(!feed) return res.status(404).send('Feed not found');
+
+      res.set('Content-Type', 'application/rss+xml');
+      res.render('feedxml', {feed: feed, layout: false});
+    })
   }
 };
-
