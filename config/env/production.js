@@ -19,6 +19,12 @@ module.exports = {
 
   models: {
      connection: 'openShiftMysql'
+  },
+
+  redis: {
+    host: process.env['OPENSHIFT_REDIS_HOST'],
+    port: process.env['OPENSHIFT_REDIS_PORT'],
+    password: process.env['OPENSHIFT_REDIS_PASSWORD']
   }
 
   /***************************************************************************

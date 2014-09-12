@@ -1,5 +1,5 @@
 var kue = require('kue');
-var jobs = kue.createQueue();
+var jobs = kue.createQueue(sails.config);
 
 module.exports = {
   refreshFeed: function(feed) {
