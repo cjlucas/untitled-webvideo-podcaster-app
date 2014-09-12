@@ -7,7 +7,7 @@ function FeedParserWorker(apiHost, apiPort, feedId, feedUrl) {
   this.feedId  = feedId;
   this.feedUrl = feedUrl;
   this.client = request.newClient('http://' + apiHost + ':' + apiPort);
-  this.client.setToken('a40367d1b133a8c9d185bac441484d46d804a0f0');
+  this.client.setToken('aac027c483d1b880bf60f88431bff7d26e65fd55');
 
   this.work = function(job, done) {
     var self = this;
@@ -58,6 +58,16 @@ function FeedParserWorker(apiHost, apiPort, feedId, feedUrl) {
     return formats.filter(function(format) {
       // filter audio formats
       if (format.height == null && format.width == null) {
+        return false;
+      }
+
+      // filter non-mp4 videos
+      if (format.ext !== 'mp4') {
+        return false;
+      }
+
+      // filter DASH video
+      if (format.acodec === 'none') {
         return false;
       }
 
@@ -158,7 +168,6 @@ function parseYoutubeDlJSON(data) {
   var videos = [];
 
   data.forEach(function(from) {
-    console.log('djfdiosajfoidsa');
     var video = {
       videoId: from.display_id,
       title: from.title,
@@ -177,7 +186,9 @@ function parseYoutubeDlJSON(data) {
       this.formats.push({
         videoUrl: format.url,
         height: format.height,
-        width: format.width
+        width: format.width,
+        ext: format.ext,
+        acodec: format.acodec
       });
     }, video);
 
