@@ -31,6 +31,52 @@ module.exports = {
           res.redirect(videoUrl);
         });
       });
+  },
+
+  /**
+   * PUT /videos/:id
+   *
+   * Request body: A single Video object
+   *
+   * Video definition:
+   *   guid: the guid of an existing Video object
+   *   videoId: site-specific video id
+   *   title
+   *   description
+   *   image: url to video image
+   *   duration: video duration in seconds
+   *   uploadDate
+   *   formats: an array of Format objects
+   *
+   * Format definition:
+   *   videoUrl: direct link to video
+   *   height
+   *   width
+   */
+  update: function(req, res) {
+    var guid = req.param('id');
+    var newVideo = req.body;
+
+    Video.update({guid: guid}, newVideo, function(err, results) {
+      if (err) return res.status(500).json({dbError: err});
+      if (results.length == 0) return res
+        .status(404)
+        .send('No video found');
+
+      var afterDestroy = function(err) {
+        if(err) return res.status(500).json({dbError: err});
+        Video.findOneById(results[0].id)
+          .populate('formats')
+          .exec(function(err, video) {
+            res.status(200).json(video);
+          });
+      };
+
+      // Because Video##update() will create new formats and disassociate
+      // any formats that were previously associated with the video,
+      // we have to manually destroy the orphaned formats
+      VideoFormat.destroy({video: null}).exec(afterDestroy);
+    });
   }
 };
 

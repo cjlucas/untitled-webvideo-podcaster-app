@@ -32,20 +32,9 @@ module.exports = {
    * Request Body:
    *   videos: An array of Video objects
    *
-   * Video definition:
-   *   videoId: site-specific video id
-   *   title
-   *   description
-   *   image: url to video image
-   *   duration: video duration in seconds
-   *   uploadDate
-   *   formats: an array of Format objects
-   *
-   * Format definition:
-   *   videoUrl: direct link to video
-   *   height
-   *   width
+   * See VideosController#update for the definition of a Video object.
    */
+
   addVideos: function(req, res) {
     var videos = req.param('videos');
     var videoIds = videos.map(function(video) {

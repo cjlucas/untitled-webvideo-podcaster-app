@@ -65,6 +65,20 @@ function FeedsControllerPolicies() {
   }
 }
 
+function VideosControllerPolicies() {
+  function adminsOnlyPolicyChain() {
+    return [
+      'loadCurrentUser',
+      'requireAdmin'
+    ];
+  }
+
+  return {
+    '*': [],
+    update: adminsOnlyPolicyChain()
+  };
+}
+
 module.exports.policies = {
 
   /***************************************************************************
@@ -79,5 +93,6 @@ module.exports.policies = {
   },
 
   UsersController: UsersControllerPolicies(),
-  FeedsController: FeedsControllerPolicies()
+  FeedsController: FeedsControllerPolicies(),
+  VideosController: VideosControllerPolicies()
 };

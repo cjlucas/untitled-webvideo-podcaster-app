@@ -41,5 +41,6 @@ module.exports.routes = {
   'post /api/feeds/:id/add_videos': 'FeedsController.addVideos',
   'get /api/feeds/:id/refresh': 'FeedsController.refresh',
 
-  'get /videos/:id/download': 'VideosController.download'
+  'get /videos/:id/download': 'VideosController.download',
+  'put /api/videos/:id': 'VideosController.update'
 };
