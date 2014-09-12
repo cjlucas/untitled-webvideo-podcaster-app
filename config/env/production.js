@@ -33,7 +33,16 @@ module.exports = {
    ***************************************************************************/
 
   host: process.env['OPENSHIFT_NODEJS_IP'],
-  port: process.env['OPENSHIFT_NODEJS_PORT']
+  port: process.env['OPENSHIFT_NODEJS_PORT'],
+
+  session: {
+    adapter: 'redis',
+    prefix: 'podcaster:sessions:',
+    host: process.env['OPENSHIFT_REDIS_HOST'],
+    port: process.env['OPENSHIFT_REDIS_PORT'],
+    pass: process.env['OPENSHIFT_REDIS_PASSWORD']
+  }
+
 
   /***************************************************************************
    * Set the log level in production environment to "silent"                 *
