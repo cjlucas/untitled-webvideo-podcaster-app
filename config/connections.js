@@ -50,12 +50,5 @@ module.exports.connections = {
     user: process.env['OPENSHIFT_MYSQL_DB_USERNAME'],
     password: process.env['OPENSHIFT_MYSQL_DB_PASSWORD'],
     database: 'podcaster'
-  },
-
-
-  localRedis: {
-    host: '127.0.0.1',
-    port: 6379
   }
-
 };

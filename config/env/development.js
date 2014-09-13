@@ -21,4 +21,10 @@ module.exports = {
   //   connection: 'someMongodbServer'
   // }
 
+  redis: {
+    prefix: 'podcaster',
+    host: '127.0.0.1',
+    port: 6379
+  }
+
 };
