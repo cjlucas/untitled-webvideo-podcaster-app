@@ -7,6 +7,6 @@ var jobs = kue.createQueue({
     auth: process.env.REDIS_AUTH
   }
 });
-var port = process.env.KUE_APP_PORT || 3000;
+var port = process.argv[process.argv.length - 1];
 kue.app.listen(port);
 console.log('UI started on port' + port);

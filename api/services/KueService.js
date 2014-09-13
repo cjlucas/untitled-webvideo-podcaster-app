@@ -23,7 +23,8 @@ module.exports = {
   refreshVideo: function(video) {
     var opts = {
       id: video.guid,
-        url: video.toUrl()
+      url: video.toUrl(),
+      title: video.toUrl()
     };
 
     jobs

@@ -1,16 +1,17 @@
 var spawn = require('child_process').spawn;
 var fs = require('fs');
-var request = require('request-json');
 var temp = require('temp');
+
+var parseYoutubeDlJSON = require('./common').parseYoutubeDlJSON;
+var newRequestClient = require('./common').newRequestClient;
+var filterFormats = require('./common').filterVideoFormats;
 
 var job;
 
 function FeedParserWorker(apiHost, apiPort, apiToken, feedId, feedUrl) {
   this.feedId  = feedId;
   this.feedUrl = feedUrl;
-  this.client = request.newClient('http://' + apiHost + ':' + apiPort);
-  this.client.setToken(apiToken);
-
+  this.client = newRequestClient(apiHost, apiPort, apiToken);
 
   this.work = function(j, done) {
     var self = this;
@@ -70,34 +71,6 @@ function FeedParserWorker(apiHost, apiPort, apiToken, feedId, feedUrl) {
       });
     });
   };
-
-  function filterFormats(formats) {
-    return formats.filter(function(format) {
-      // filter audio formats
-      if (format.height == null && format.width == null) {
-        return false;
-      }
-
-      // filter non-mp4 videos
-      if (format.ext !== 'mp4') {
-        return false;
-      }
-
-      // filter DASH video
-      if (format.acodec === 'none') {
-        return false;
-      }
-
-      // filter tiny videos
-      if (format.height < 240) {
-        return false;
-      }
-
-      return true;
-    });
-
-    return formats;
-  }
 
 
   function scrape(feedUrl, downloadArchive, callback) {
@@ -174,41 +147,6 @@ function FeedParserWorker(apiHost, apiPort, apiToken, feedId, feedUrl) {
   }
 }
 
-/**
- * Map youtube-dl json data to data suitable for /api/feeds/add_videos
- */
-function parseYoutubeDlJSON(data) {
-  var videos = [];
 
-  data.forEach(function(from) {
-    var video = {
-      videoId: from.display_id,
-      title: from.title,
-      description: from.description,
-      image: from.thumbnail,
-      duration: from.duration,
-      uploadDate: new Date(
-        from.upload_date.slice(0, 4),
-        from.upload_date.slice(4, 6),
-        from.upload_date.slice(6, 8)
-      ),
-      formats: []
-    };
-
-    from.formats.forEach(function(format) {
-      this.formats.push({
-        videoUrl: format.url,
-        height: format.height,
-        width: format.width,
-        ext: format.ext,
-        acodec: format.acodec
-      });
-    }, video);
-
-    videos.push(video);
-  });
-
-  return videos;
-}
 
 module.exports = FeedParserWorker;

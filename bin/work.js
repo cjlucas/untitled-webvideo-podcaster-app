@@ -11,14 +11,23 @@ var jobs = kue.createQueue({
 });
 
 var FeedParserWorker = require('../workers/feed-parser-worker');
+var RefreshVideoDataWorker = require('../workers/refresh-video-data-worker');
 
 var apiHost = process.env.API_HOST || '127.0.0.1';
 var apiPort = process.env.API_PORT || 1337;
 var apiToken = process.env.API_TOKEN;
 
 jobs.process('feed parser', 1, function(job, done) {
-  console.log('got a job');
   var feedId = job.data.id;
   var feedUrl = job.data.url;
-  new FeedParserWorker(apiHost, apiPort, apiToken, feedId, feedUrl).work(job, done);
+  new FeedParserWorker(apiHost, apiPort, apiToken, feedId, feedUrl)
+    .work(job, done);
+});
+
+jobs.process('refresh video data', 5, function(job, done) {
+  var videoId = job.data.id;
+  var videoUrl = job.data.url;
+  console.log('NEW JOB: refresh video data videoId: ' + videoId + ' videoUrl: ' + videoUrl);
+  new RefreshVideoDataWorker(apiHost, apiPort, apiToken, videoId, videoUrl)
+    .work(job, done);
 });
