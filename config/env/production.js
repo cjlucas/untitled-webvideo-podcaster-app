@@ -28,10 +28,6 @@ module.exports = {
     password: process.env['OPENSHIFT_REDIS_DB_PASSWORD']
   },
 
-  /***************************************************************************
-   * Set the port in the production environment to 80                        *
-   ***************************************************************************/
-
   host: process.env['OPENSHIFT_NODEJS_IP'],
   port: process.env['OPENSHIFT_NODEJS_PORT'],
 
@@ -42,15 +38,8 @@ module.exports = {
     port: process.env['OPENSHIFT_REDIS_DB_PORT'],
     pass: process.env['OPENSHIFT_REDIS_DB_PASSWORD'],
     secret: process.env['OPENSHIFT_SECRET_TOKEN']
-  }
+  },
 
-
-  /***************************************************************************
-   * Set the log level in production environment to "silent"                 *
-   ***************************************************************************/
-
-  // log: {
-  //   level: "silent"
-  // }
-
+  publicHost: 'podcaster-cjlucas.rhcloud.com',
+  publicPort: 80
 };

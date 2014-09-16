@@ -34,8 +34,10 @@ module.exports = {
       if(err) return res.status(500).json({dbError: err});
       if(!feed) return res.status(404).send('Feed not found');
 
+      var address = PublicAddressService.getPublicAddress();
+
       res.set('Content-Type', 'application/rss+xml');
-      res.render('feedxml', {feed: feed, layout: false});
+      res.render('feedxml', {feed: feed, address: address, layout: false});
     })
   }
 };
