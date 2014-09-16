@@ -11,27 +11,58 @@ var urlParser = require('url').parse;
 
 module.exports = {
 
-  // GET /videos/:id/download
+  /**
+   * GET /videos/:id/download
+   *
+   * Request Parameters:
+   *   - maxHeight: the maximum height of the requested video
+   *   - timeout: If a video's url is stale, the system will attempt to
+   *              retrieve a a valid url. This parameter limits how long
+   *              the system should stall before returning a response.
+   */
   download: function(req, res) {
     var guid = req.param('id');
     var maxHeight = req.param('maxHeight');
+    var timeout = req.param('timeout') || 30;
+    var retryCount = Math.ceil(timeout / 2);
+    var timer;
+    var refreshJobQueued = false;
 
-    Video.findOneByGuid(guid)
-      .populate('formats', {sort: 'height DESC'})
-      .exec(function(err, video) {
-        if(err) return res.status(500).json({dbError: err});
+    var looper = function() {
+      if (retryCount == 0) {
+        clearInterval(timer);
+        res.set('Retry-After', 2 * 60);
+        return res.status(503).end();
+      }
 
-        // check if video url is still alive
-        var videoUrl = formatWithMaxHeight(maxHeight, video.formats).videoUrl;
-        pingUrl(videoUrl, function(isValid) {
-          if (!isValid) {
-            KueService.refreshVideo(video);
-            res.set('Retry-After', 2 * 60);
-            return res.status(503).end();
-          }
-          res.redirect(videoUrl);
+      retryCount--;
+
+      Video.findOneByGuid(guid)
+        .populate('formats', {sort: 'height DESC'})
+        .exec(function(err, video) {
+          if (err || !video) clearInterval(timer);
+          if(err) return res.status(500).json({dbError: err});
+          if (!video) return res.status(404).json({err: 'Video not found'});
+
+          // check if video url is still alive
+          var videoUrl = formatWithMaxHeight(maxHeight, video.formats).videoUrl;
+          pingUrl(videoUrl, function(isValid) {
+            if (!isValid) {
+                if (!refreshJobQueued) {
+                  refreshJobQueued = true;
+                  KueService.refreshVideo(video);
+                }
+            } else {
+              clearInterval(timer);
+              res.redirect(videoUrl);
+            }
+          });
         });
-      });
+    };
+
+
+    looper();
+    timer = setInterval(looper, 2000);
   },
 
   /**
