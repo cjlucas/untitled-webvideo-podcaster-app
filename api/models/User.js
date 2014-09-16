@@ -94,7 +94,7 @@ var UserSchema = new Schema({
   password: {type: String, required: true},
   role: {type: String, required: true, enum: validRoles, default: 'user'},
   token: String,
-  feeds: {type: Schema.Types.ObjectId, ref: 'Feed'}
+  feeds: [{type: Schema.Types.ObjectId, ref: 'Feed'}]
 });
 
 /**
@@ -118,7 +118,7 @@ UserSchema.pre('save', function(next) {
   if (this.token == null) {
     this.token = createToken();
   }
-  done();
+  next();
 });
 
 /**
@@ -126,7 +126,7 @@ UserSchema.pre('save', function(next) {
  */
 
 UserSchema.statics.login = function(email, password, callback) {
-  findOne({email: email}, function(err, user) {
+  this.findOne({email: email}, function(err, user) {
     if (err) return callback(err, null);
     if (!user) return callback('User with email not found', null);
 
@@ -139,3 +139,5 @@ UserSchema.statics.login = function(email, password, callback) {
     })
   });
 };
+
+module.exports = UserSchema;

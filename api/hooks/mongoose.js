@@ -1,4 +1,4 @@
-function setupMongoose() {
+function setupMongoose(sails) {
   /**
    * Setup connection
    */
@@ -25,18 +25,20 @@ function setupMongoose() {
    */
 
   var models = require('require-all')(sails.config.paths.models);
-  console.log('modelsss');
+//  console.log('modelsss');
   Object.keys(models).forEach(function(modelName) {
-    if (modelName !== 'User') return;
-    console.log(modelName);
+//    console.log(modelName);
+//    console.log(models[modelName]);
     global[modelName] = mongoose.model(modelName, models[modelName]);
+  });
 
-    console.log(User);
+  sails.on('lower', function() {
+    mongoose.disconnect();
   });
 }
 
 module.exports = function(sails) {
   return {
-    initialize: setupMongoose()
+    initialize: setupMongoose(sails)
   };
 };

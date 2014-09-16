@@ -137,7 +137,7 @@ describe('FeedsControllerPolicies', function() {
           if (err) return done(err);
           associatedFeed = results[0];
           disassociatedFeed = results[1];
-          user.feeds.add(associatedFeed);
+          user.feeds.push(associatedFeed);
           user.save(done);
         });
       });

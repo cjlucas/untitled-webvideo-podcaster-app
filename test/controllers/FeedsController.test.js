@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 
 var helper = require('../helper');
 
-describe('FeedsController', function() {
+describe.only('FeedsController', function() {
   var agent;
 
   before(function(done) {
@@ -56,9 +56,10 @@ describe('FeedsController', function() {
 
           videoIds = getIds(videos);
 
+          console.log(feed);
           // associate videos with feed
           for (var i = 0; i < videos.length; i++) {
-            feed.videos.add(videos[i]);
+            feed.videos.push(videos[i]);
           }
 
           feed.save(done);
@@ -75,6 +76,7 @@ describe('FeedsController', function() {
           .expect(200)
           .end(function(err, res) {
             assert.equal(res.body.guid, id);
+            assert.ok(res.body.videos);
             assert.sameMembers(videoIds, getIds(res.body.videos));
             done();
           });
@@ -145,7 +147,6 @@ describe('FeedsController', function() {
       helper.series()
         .destroyAll(Feed)
         .destroyAll(Video)
-        .destroyAll(VideoFormat)
         .createModels(Feed, helper.validFeedCriteria())
         .end(function(err, results) {
           if (err) return done(err);

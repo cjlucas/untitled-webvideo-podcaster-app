@@ -1,6 +1,7 @@
 var SailsApp = require('sails').Sails;
 var request = require('supertest');
 var async = require('async');
+var rc = require('rc');
 
 function setSails(sails) {
   module.exports.sails = sails;
@@ -66,23 +67,26 @@ function Series() {
     var tasks = this.newTasks();
     var self = this;
 
-    Model.find().exec(function(err, models) {
-      if (err) throw err;
-
-      var destroyModel = function(model) {
-        return function(cb) {
-          model.destroy(function(err) {
-            cb(err, "destroyed: " + model);
-          });
-        }
-      };
-
-      models.forEach(function(model) {
-       this.push(destroyModel(model));
-      }, tasks);
-
-      self.decrNumRunningTaskProducers();
+    tasks.push(function(cb) {
+      Model.remove(cb);
     });
+
+//    Model.find().exec(function(err, models) {
+//      if (err) throw err;
+//
+//      var destroyModel = function(model) {
+//        return function(cb) {
+//          model.destroy(function(err) {
+//            cb(err, "destroyed: " + model);
+//          });
+//        }
+//      };
+//
+//      models.forEach(function(model) {
+//       this.push(destroyModel(model));
+//      }, tasks);
+//    });
+    self.decrNumRunningTaskProducers();
 
     return this;
   };
@@ -94,7 +98,7 @@ function Series() {
 
     var createModel = function(criteria) {
       return function(cb) {
-        Model.create(criteria).exec(cb);
+        Model.create(criteria, cb);
       }
     };
 
@@ -122,7 +126,7 @@ function TestHelper() {
     this.sailsLiftedCount++;
 
     var sails = new SailsApp();
-    sails.lift({}, function(err, sails) {
+    sails.lift(rc('sails'), function(err, sails) {
       if (err) {
         console.log('lift error:' + err);
         return callback(err);

@@ -45,7 +45,6 @@ describe('VideosController', function() {
     beforeEach(function(done) {
       helper.series()
         .destroyAll(Video)
-        .destroyAll(VideoFormat)
         .createModels(Video, video)
         .end(function(err, results) {
           if (err) return done(err);
@@ -160,7 +159,6 @@ describe('VideosController', function() {
 
       helper.series()
         .destroyAll(Video)
-        .destroyAll(VideoFormat)
         .createModels(Video, video)
         .end(done);
     });

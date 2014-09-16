@@ -30,7 +30,7 @@ module.exports = {
    */
 
   feed: function(req, res) {
-    Feed.findOneByGuid(req.param('id')).populate('videos').exec(function(err, feed) {
+    Feed.findOneById(req.param('id')).populate('videos').exec(function(err, feed) {
       if(err) return res.status(500).json({dbError: err});
       if(!feed) return res.status(404).send('Feed not found');
 

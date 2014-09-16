@@ -6,16 +6,11 @@
  * @note This policy should be used in conjunction with requireIdParameter.
  */
 module.exports = function(req, res, next) {
-  Feed.findOneByGuid(req.param('id'))
-    .then(function(feed) {
-      if (!feed) return res.status(404).json({error: 'Feed not found'});
-      req.feed = feed;
-      next();
-    })
-    .fail(function(err) {
-      return res
-        .status(500)
-        .json({error: 'Error occured during query', dbError: err});
-    });
+  Feed.findOneById(req.param('id'), function(exec, feed) {
+    if (err) return res.status(500).json({dbError: err});
+    if (!feed) return res.status(404).json({error: 'Feed not found'});
 
+    req.feed = feed;
+    next();
+  });
 };

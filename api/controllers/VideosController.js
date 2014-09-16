@@ -13,10 +13,10 @@ module.exports = {
 
   // GET /videos/:id/download
   download: function(req, res) {
-    var guid = req.param('id');
+    var id = req.param('id');
     var maxHeight = req.param('maxHeight');
 
-    Video.findOneByGuid(guid)
+    Video.findOneById(id)
       .populate('formats', {sort: 'height DESC'})
       .exec(function(err, video) {
         if(err) return res.status(500).json({dbError: err});

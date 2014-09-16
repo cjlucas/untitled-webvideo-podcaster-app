@@ -11,11 +11,11 @@ module.exports = {
    * /api/feeds
    */
   find: function(req, res) {
-    var guid = req.param('id');
+    var id = req.param('id');
     var query;
 
-    if (guid != null) {
-      query = Feed.findOneByGuid(guid);
+    if (id != null) {
+      query = Feed.findOneById(id);
     } else {
       query = Feed.find();
     }
@@ -60,7 +60,7 @@ module.exports = {
 
         videos.forEach(function(video) {
           video.site = req.feed.site;
-          req.feed.videos.add(video);
+          req.feed.videos.push(video);
         });
 
         req.feed.save(function(err) {
