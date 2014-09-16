@@ -35,7 +35,8 @@
     "sails-mysql": "~0.10.6",
     "supertest": "^0.13.0",
     "temp": "^0.8.1",
-    "mitm": "~0.5.1"
+    "mitm": "~0.5.1",
+    "request": "~2.42.0"
   },
   "scripts": {
     "start": "node app.js --prod",

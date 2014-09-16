@@ -5,9 +5,7 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var http = require('http');
-var https = require('https');
-var urlParser = require('url').parse;
+var request = require('request');
 
 module.exports = {
 
@@ -21,16 +19,15 @@ module.exports = {
    *              the system should stall before returning a response.
    */
   download: function(req, res) {
+    const INTERVAL_SECS = 2;
     var guid = req.param('id');
     var maxHeight = req.param('maxHeight');
     var timeout = req.param('timeout') || 30;
-    var retryCount = Math.ceil(timeout / 2);
-    var timer;
+    var retryCount = Math.ceil(timeout / INTERVAL_SECS);
     var refreshJobQueued = false;
 
-    var looper = function() {
+    var loadVideoUrl = function() {
       if (retryCount == 0) {
-        clearInterval(timer);
         res.set('Retry-After', 2 * 60);
         return res.status(503).end();
       }
@@ -40,20 +37,31 @@ module.exports = {
       Video.findOneByGuid(guid)
         .populate('formats', {sort: 'height DESC'})
         .exec(function(err, video) {
-          if (err || !video) clearInterval(timer);
           if(err) return res.status(500).json({dbError: err});
           if (!video) return res.status(404).json({err: 'Video not found'});
 
+          if (video.formats.length == 0) {
+            console.log("WARNING: video.formats is empty");
+            return;
+          }
+
           // check if video url is still alive
           var videoUrl = formatWithMaxHeight(maxHeight, video.formats).videoUrl;
-          pingUrl(videoUrl, function(isValid) {
-            if (!isValid) {
-                if (!refreshJobQueued) {
-                  refreshJobQueued = true;
-                  KueService.refreshVideo(video);
-                }
+          var reqOptions = {
+            url: videoUrl,
+            method: 'HEAD',
+            timeout: 2000,
+            followRedirect: false
+          };
+          request(reqOptions, function(err, resp, body) {
+            if (err || resp.statusCode >= 400) {
+              if (!refreshJobQueued) {
+                refreshJobQueued = true;
+                KueService.refreshVideo(video);
+              }
+
+              setTimeout(loadVideoUrl, INTERVAL_SECS * 1000);
             } else {
-              clearInterval(timer);
               res.redirect(videoUrl);
             }
           });
@@ -61,8 +69,7 @@ module.exports = {
     };
 
 
-    looper();
-    timer = setInterval(looper, 2000);
+    loadVideoUrl();
   },
 
   /**
@@ -111,17 +118,6 @@ module.exports = {
     });
   }
 };
-
-function pingUrl(url, callback) {
-  var opts = urlParser(url);
-  opts.method = 'HEAD';
-  var transport = opts.protocol === 'http:' ? http : https;
-  var req = transport.request(opts, function(res) {
-    return callback(res.statusCode == 200);
-  });
-
-  req.end();
-}
 
 function formatWithMaxHeight(maxHeight, formats) {
   formats.sort(function(a, b) {
