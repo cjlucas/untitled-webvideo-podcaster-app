@@ -5,6 +5,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+var Schema = require('mongoose').Schema;
+
+/**
+ * Helpers
+ */
+
 FeedMatcher = function(regex, feedIdIndex, site, feedType) {
   this.regex = regex;
   this.feedIdIndex = feedIdIndex;
@@ -72,6 +78,10 @@ function urlForFeed(feed) {
 
   throw new Error("Can't generate url for feed");
 }
+
+/**
+ * Schema
+ */
 
 var FeedModel = {
   attributes: {

@@ -11,20 +11,9 @@
  */
 
 module.exports = {
-
-  /***************************************************************************
-   * Set the default database connection for models in the development       *
-   * environment (see config/connections.js and config/models.js )           *
-   ***************************************************************************/
-
-  // models: {
-  //   connection: 'someMongodbServer'
-  // }
-
   redis: {
     prefix: 'podcaster',
     host: '127.0.0.1',
     port: 6379
   }
-
 };
