@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 
 var helper = require('../helper');
 
-describe.only('FeedsController', function() {
+describe('FeedsController', function() {
   var agent;
 
   before(function(done) {
