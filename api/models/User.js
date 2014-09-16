@@ -7,6 +7,7 @@
 
 var crypto = require('crypto');
 var bcrypt = require('bcrypt');
+var Schema = require('mongoose').Schema;
 
 function isEncrypted(string) {
   try {
@@ -93,7 +94,7 @@ var UserSchema = new Schema({
   password: {type: String, required: true},
   role: {type: String, required: true, enum: validRoles, default: 'user'},
   token: String,
-  feeds: {type: Schema.types.ObjectId, ref: 'Feed'}
+  feeds: {type: Schema.Types.ObjectId, ref: 'Feed'}
 });
 
 /**
@@ -125,7 +126,7 @@ UserSchema.pre('save', function(next) {
  */
 
 UserSchema.statics.login = function(email, password, callback) {
-  User.findOne({email: email}, function(err, user) {
+  findOne({email: email}, function(err, user) {
     if (err) return callback(err, null);
     if (!user) return callback('User with email not found', null);
 
