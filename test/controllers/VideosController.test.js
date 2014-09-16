@@ -110,7 +110,7 @@ describe('VideosController', function() {
       });
     });
 
-    describe.only('when url for requested format is not valid', function() {
+    describe('when url for requested format is not valid', function() {
       var mitm;
       before(function(done) {
         // intercept the HEAD request and simulate an expired video link
