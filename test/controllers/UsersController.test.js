@@ -8,8 +8,7 @@ describe('UsersController', function() {
   before(function(done) {
     helper.liftSails(function(err, sails) {
       agent = helper.getAgent(sails);
-      // allow full access to api
-      helper.loginWithAdminAuthority(agent, done);
+      done();
     });
 
   });
@@ -58,11 +57,13 @@ describe('UsersController', function() {
     var feed;
     // we need a user in the db to make
     before(function(done) {
-      helper.createModels(
-        User, helper.validUserCriteria(), function(err, results) {
+      helper.series()
+        .destroyAll(User)
+        .createModels(User, helper.validUserCriteria())
+        .end(function(err, results) {
           if (err) return done(err);
           user = results[results.length - 1];
-          done();
+          helper.loginWithAdminAuthority(agent, done);
       });
     });
 

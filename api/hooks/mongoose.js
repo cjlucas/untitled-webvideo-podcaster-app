@@ -20,6 +20,10 @@ function setupMongoose(sails) {
     }
   );
 
+  if (sails.config.environment === 'test') {
+    mongoose.connection.db.dropDatabase();
+  }
+
   /**
    * Setup Models
    */

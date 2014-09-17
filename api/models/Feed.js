@@ -39,13 +39,10 @@ addFeedMatcher(/youtube.com\/user\/(\w*)[\?\&]?/i, 1, 'youtube', 'channel');
 function findOrCreateFeed(criteria, callback) {
   Feed.findOne(criteria).exec(function(error, feed) {
     if (feed == null) {
-      Feed.create(criteria)
-        .then(function(feed) {
-          callback(feed);
-        })
-        .fail(function(error) {
-          throw error;
-        });
+      Feed.create(criteria, function(err, feed) {
+        if (err) throw err;
+        callback(feed);
+      });
     } else {
       callback(feed);
     }
