@@ -15,7 +15,7 @@ module.exports = {
     var query;
 
     if (id != null) {
-      query = Feed.findOneById(id);
+      query = Feed.findById(id);
     } else {
       query = Feed.find();
     }
@@ -41,14 +41,14 @@ module.exports = {
       return video.videoId;
     });
 
-    Feed.findOneById(req.feed.id).populate('videos', {videoId: videoIds})
+    Feed.findById(req.feed.id).populate('videos', {videoId: videoIds})
       .exec(function(err, feed) {
         if (err) return res.status(500).json({dbError: err});
 
         feed.videos.forEach(function(existingVideo) {
+          // remove updated video from array
           var updatedVideoCriteria =
             getVideoWithId(existingVideo.videoId, videos);
-          // remove updated video from array
           videos.splice(videos.indexOf(updatedVideoCriteria), 1);
 
 
@@ -58,20 +58,24 @@ module.exports = {
           });
         });
 
-        videos.forEach(function(video) {
-          video.site = req.feed.site;
-          req.feed.videos.push(video);
+        Video.create(videos, function(err) {
+          if (err) return res.status(500).json({dbError: err});
+
+          for (var i = 1; i < arguments.length; i++) {
+            feed.videos.push(arguments[i]);
+          }
+
+          feed.save(function(err) {
+            if (err) {
+              return res
+                .status(500)
+                .json({error: 'Error when saving feed', dbError: err});
+            } else {
+              return res.status(200).end();
+            }
+          });
         });
 
-        req.feed.save(function(err) {
-          if (err) {
-            return res
-              .status(500)
-              .json({error: 'Error when saving feed', dbError: err});
-          } else {
-            return res.status(200).end();
-          }
-        });
       });
   },
 

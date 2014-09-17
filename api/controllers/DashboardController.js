@@ -8,7 +8,7 @@
 module.exports = {
   index: function(req, res) {
     User
-      .findOneById(req.currentUser.id)
+      .findById(req.currentUser.id)
       .populate('feeds')
       .exec(function(err, user) {
         res.render('feeds', {user: user});
@@ -30,7 +30,7 @@ module.exports = {
    */
 
   feed: function(req, res) {
-    Feed.findOneById(req.param('id')).populate('videos').exec(function(err, feed) {
+    Feed.findById(req.param('id')).populate('videos').exec(function(err, feed) {
       if(err) return res.status(500).json({dbError: err});
       if(!feed) return res.status(404).send('Feed not found');
 

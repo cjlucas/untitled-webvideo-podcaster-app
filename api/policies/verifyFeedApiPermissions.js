@@ -13,7 +13,7 @@ module.exports = function(req, res, next) {
     return next();
   }
 
-  Feed.findOneById(req.feed.id)
+  Feed.findById(req.feed.id)
     .populate('users', {id: req.currentUser.id})
     .exec(function(err, feed) {
       if (err) {

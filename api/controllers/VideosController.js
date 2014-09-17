@@ -16,7 +16,7 @@ module.exports = {
     var id = req.param('id');
     var maxHeight = req.param('maxHeight');
 
-    Video.findOneById(id)
+    Video.findById(id)
       .populate('formats', {sort: 'height DESC'})
       .exec(function(err, video) {
         if(err) return res.status(500).json({dbError: err});
@@ -59,6 +59,8 @@ module.exports = {
     var newVideo = req.body;
 
     Video.update({guid: guid}, newVideo, function(err, results) {
+      // TODO: should return a 400 if err because
+      // it means an invalid id was given
       if (err) return res.status(500).json({dbError: err});
       if (results.length == 0) return res
         .status(404)
@@ -66,7 +68,7 @@ module.exports = {
 
       var afterDestroy = function(err) {
         if(err) return res.status(500).json({dbError: err});
-        Video.findOneById(results[0].id)
+        Video.findById(results[0].id)
           .populate('formats')
           .exec(function(err, video) {
             res.status(200).json(video);

@@ -47,7 +47,7 @@ var UsersController = {
         return res.status(400).json({error: 'Invalid feed url'});
       }
 
-      User.findOneById(userId)
+      User.findById(userId)
         .then(function(user) {
           var saveUser = function() {
             user.save(function(err) {
