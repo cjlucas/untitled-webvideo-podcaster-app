@@ -55,30 +55,16 @@ module.exports = {
    *   width
    */
   update: function(req, res) {
-    var guid = req.param('id');
+    var id = req.param('id');
     var newVideo = req.body;
 
-    Video.update({guid: guid}, newVideo, function(err, results) {
+    Video.findByIdAndUpdate(id, newVideo, function(err, video) {
       // TODO: should return a 400 if err because
       // it means an invalid id was given
       if (err) return res.status(500).json({dbError: err});
-      if (results.length == 0) return res
-        .status(404)
-        .send('No video found');
+      if (!video) return res.status(404).send('No video found');
 
-      var afterDestroy = function(err) {
-        if(err) return res.status(500).json({dbError: err});
-        Video.findById(results[0].id)
-          .populate('formats')
-          .exec(function(err, video) {
-            res.status(200).json(video);
-          });
-      };
-
-      // Because Video##update() will create new formats and disassociate
-      // any formats that were previously associated with the video,
-      // we have to manually destroy the orphaned formats
-      VideoFormat.destroy({video: null}).exec(afterDestroy);
+      return res.json(video);
     });
   }
 };

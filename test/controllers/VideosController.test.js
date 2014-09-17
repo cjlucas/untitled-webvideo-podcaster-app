@@ -35,7 +35,7 @@ describe('VideosController', function() {
     };
 
     function downloadRequest(video, maxHeight) {
-      var url = '/videos/' + video.guid + '/download';
+      var url = '/videos/' + video.id + '/download';
       if (maxHeight != null) {
         url = url + '?maxHeight=' + maxHeight;
       }
@@ -49,8 +49,7 @@ describe('VideosController', function() {
         .end(function(err, results) {
           if (err) return done(err);
           video = results[results.length - 1];
-          video.formats.add(format1080);
-          video.formats.add(format720);
+          video.formats = [format1080, format720];
           video.save(done);
         });
     });
@@ -149,7 +148,7 @@ describe('VideosController', function() {
 
     function updateRequest(video) {
       return agent
-        .put('/api/videos/' + video.guid)
+        .put('/api/videos/' + video.id)
         .send(video);
     }
 
@@ -160,7 +159,11 @@ describe('VideosController', function() {
       helper.series()
         .destroyAll(Video)
         .createModels(Video, video)
-        .end(done);
+        .end(function(err, results) {
+          if (err) return done(err);
+          video = results[results.length - 1];
+          done();
+        });
     });
 
     it('should add a format', function(done) {
@@ -191,13 +194,7 @@ describe('VideosController', function() {
             assert.lengthOf(res.body.formats, 1);
             assert.equal(res.body.formats[0].videoUrl,
               video.formats[0].videoUrl);
-
-            // ensure #update() cleaned up orphaned formats
-            VideoFormat.find().exec(function(err, results) {
-              assert.ifError(err);
-              assert.lengthOf(results, 1);
-              done();
-            });
+            done();
           });
       };
 
@@ -213,7 +210,7 @@ describe('VideosController', function() {
     });
 
     it('should return a 404 if an non-existant video is specified', function(done) {
-      video.guid = Math.floor(video.guid / 2);
+      video._id = '507f191e810c19729de860ea';
       updateRequest(video).expect(404, done);
     });
   });
