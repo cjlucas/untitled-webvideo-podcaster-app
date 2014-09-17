@@ -86,7 +86,7 @@ describe('UsersController', function() {
             assert.equal(res.body.feedId, feed.feedId);
 
             // check if feed was actually added to user
-            User.findOneById(user.id)
+            User.findById(user.id)
               .populate('feeds')
               .exec(function(err, user) {
                 assert.ifError(err);
