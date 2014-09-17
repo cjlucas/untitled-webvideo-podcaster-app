@@ -13,17 +13,23 @@ module.exports = function(req, res, next) {
     return next();
   }
 
-  Feed.findById(req.feed.id)
-    .populate('users', {id: req.currentUser.id})
-    .exec(function(err, feed) {
+  User.findById(req.currentUser.id)
+    .populate('feeds')
+    .exec(function(err, user) {
       if (err) {
         res
           .status(500)
           .json({error: 'Error when verifying api permissions', dbError: err});
-      } else if (feed.users.length == 0) {
+      } else if (getIds(user.feeds).indexOf(req.feed.id)) {
         res.status(403).send('Permission Denied');
       } else {
         next();
       }
     });
 };
+
+function getIds(models) {
+  return models.map(function(model) {
+    return model.id;
+  });
+}

@@ -29,10 +29,7 @@ function setupMongoose(sails) {
    */
 
   var models = require('require-all')(sails.config.paths.models);
-//  console.log('modelsss');
   Object.keys(models).forEach(function(modelName) {
-//    console.log(modelName);
-//    console.log(models[modelName]);
     global[modelName] = mongoose.model(modelName, models[modelName]);
   });
 
