@@ -5,6 +5,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
+var Schema = require('mongoose').Schema;
+
+/**
+ * Helpers
+ */
+
 FeedMatcher = function(regex, feedIdIndex, site, feedType) {
   this.regex = regex;
   this.feedIdIndex = feedIdIndex;
@@ -33,13 +39,10 @@ addFeedMatcher(/youtube.com\/user\/(\w*)[\?\&]?/i, 1, 'youtube', 'channel');
 function findOrCreateFeed(criteria, callback) {
   Feed.findOne(criteria).exec(function(error, feed) {
     if (feed == null) {
-      Feed.create(criteria)
-        .then(function(feed) {
-          callback(feed);
-        })
-        .fail(function(error) {
-          throw error;
-        });
+      Feed.create(criteria, function(err, feed) {
+        if (err) throw err;
+        callback(feed);
+      });
     } else {
       callback(feed);
     }
@@ -73,62 +76,34 @@ function urlForFeed(feed) {
   throw new Error("Can't generate url for feed");
 }
 
-var FeedModel = {
-  attributes: {
-    guid: {
-      type: 'integer',
-      index: true
-    },
+/**
+ * Schema
+ */
 
-    site: {
-      type: 'string',
-      enum: ['youtube'],
-      required: true
-    },
+var validSites = ['youtube'];
+var validFeedTypes = ['channel'];
 
-    feedType: {
-      type: 'string',
-      enum: ['channel'],
-      required: true
-    },
+var FeedSchema = new Schema({
+  site: {type: String, enum: validSites, required: true},
+  feedType: {type: String, enum: validFeedTypes, required: true},
+  feedId: {type: String, required: true},
+  videos: [{type: Schema.Types.ObjectId, ref: 'Video'}]
+});
 
-    feedId: {
-      type: 'string',
-      required: true
-    },
-
-    users: {
-      collection: 'user',
-      via: 'feeds'
-    },
-
-    videos: {
-      collection: 'video',
-      via: 'feed'
-    },
-
-    toUrl: function() {
-      return urlForFeed(this);
-    },
-
-    toJSON: function() {
-      var obj = this.toObject();
-      obj.url = this.toUrl();
-      return obj;
-    }
-
-  },
-
-  beforeCreate: function(criteria, callback) {
-    GuidService.getGuid(Feed, function(guid) {
-      criteria.guid = guid;
-      callback();
-    });
-  },
-
-  fromUrl: function(url, callback) {
-    return feedForUrl(url, callback);
+FeedSchema.set('toJSON', {
+  transform: function(doc, ret, options) {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
   }
+});
+
+FeedSchema.statics.fromUrl = function(url, callback) {
+  return feedForUrl(url, callback);
 };
 
-module.exports = FeedModel;
+FeedSchema.methods.toUrl = function() {
+  return urlForFeed(this);
+};
+
+module.exports = FeedSchema;

@@ -58,7 +58,7 @@ describe('FeedsController', function() {
 
           // associate videos with feed
           for (var i = 0; i < videos.length; i++) {
-            feed.videos.add(videos[i]);
+            feed.videos.push(videos[i]);
           }
 
           feed.save(done);
@@ -69,12 +69,12 @@ describe('FeedsController', function() {
       before(createFeedWithVideos);
 
       it('should return a feed when given valid id', function(done) {
-        var id = feed.guid;
         agent
-          .get('/api/feeds/' + id)
+          .get('/api/feeds/' + feed.id)
           .expect(200)
           .end(function(err, res) {
-            assert.equal(res.body.guid, id);
+            assert.equal(res.body.id, feed.id);
+            assert.ok(res.body.videos);
             assert.sameMembers(videoIds, getIds(res.body.videos));
             done();
           });
@@ -145,7 +145,6 @@ describe('FeedsController', function() {
       helper.series()
         .destroyAll(Feed)
         .destroyAll(Video)
-        .destroyAll(VideoFormat)
         .createModels(Feed, helper.validFeedCriteria())
         .end(function(err, results) {
           if (err) return done(err);
@@ -160,11 +159,11 @@ describe('FeedsController', function() {
     ];
 
     it('should add videos to a feed', function(done) {
-      addVideosRequest(feed.guid, videos)
+      addVideosRequest(feed.id, videos)
         .expect(200)
         .end(function(err, res) {
           assert.ifError(err);
-          Feed.findOneById(feed.id).populate('videos')
+          Feed.findById(feed.id).populate('videos')
             .exec(function(err, feed) {
               assert.ifError(err);
               expect(feed.videos).to.have.length(2);
@@ -181,11 +180,11 @@ describe('FeedsController', function() {
         videoUrl: 'http://google.com/path/to/1080p.mp4'
       });
 
-      addVideosRequest(feed.guid, [video])
+      addVideosRequest(feed.id, [video])
         .expect(200)
         .end(function(err, res) {
           assert.ifError(err);
-          Feed.findOneById(feed.id).populate('videos')
+          Feed.findById(feed.id).populate('videos')
             .exec(function(err, feed) {
               assert.ifError(err);
               assert.lengthOf(feed.videos, 1);
@@ -195,14 +194,19 @@ describe('FeedsController', function() {
         });
     });
 
-    it('should return a 404 if an invalid feed id is given', function(done) {
-        addVideosRequest(feed.guid + 1, videos).expect(404, done);
+    it('should return a 400 if an invalid feed id is given', function(done) {
+      // mongoose will raise an error if a non-objectid is given
+      addVideosRequest('fdsa432fdsa', videos).expect(400, done)
+    });
+
+    it('should return a 404 if a valid, but nonexistant, feed id is given', function(done) {
+      addVideosRequest('507f191e810c19729de860ea', videos).expect(404, done)
     });
 
     it('should update an existing video', function(done) {
       var video = helper.validVideoCriteria();
       // initial add videos request should create a new video object
-      addVideosRequest(feed.guid, [video])
+      addVideosRequest(feed.id, [video])
         .expect(200)
         .end(function(err, res) {
           assert.ifError(err);
@@ -214,13 +218,14 @@ describe('FeedsController', function() {
             height: 1080,
             videoUrl: 'http://google.com/path/to/1080p.mp4'
           });
+
           // second request should update the existing video
           // with the new title and new format entry
-          addVideosRequest(feed.guid, [video])
+          addVideosRequest(feed.id, [video])
             .expect(200)
             .end(function(err, res) {
               assert.ifError(err);
-              Feed.findOneById(feed.id).populate('videos')
+              Feed.findById(feed.id).populate('videos')
                 .exec(function(err, feed) {
                   assert.ifError(err);
                   // assert video info was updated
@@ -229,7 +234,7 @@ describe('FeedsController', function() {
 
                   assert.lengthOf(feed.videos[0].formats, 2);
                   // assert video link was updated
-                  assert.deepEqual(feed.videos[0].formats[0], video.formats[0]);
+                  assert.equal(feed.videos[0].formats[0].videoUrl, video.formats[0].videoUrl);
                   // assert new format was added
                   assert.equal(feed.videos[0].formats[-1], video.formats[-1]);
                   done();

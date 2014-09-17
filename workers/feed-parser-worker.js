@@ -63,6 +63,8 @@ function FeedParserWorker(apiHost, apiPort, apiToken, feedId, feedUrl) {
             {videos: videos.slice(cursor, cursor + BATCH_SIZE)},
             function(err, res, body) {
               job.log('/add_videos response status code: %d', res.statusCode);
+              job.log('/add_videos response body:');
+              job.log(JSON.stringify(body));
             });
           cursor += BATCH_SIZE;
         }

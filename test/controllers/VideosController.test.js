@@ -34,29 +34,22 @@ describe('VideosController', function() {
       videoUrl: 'http://example.org?vid=2'
     };
 
-    function downloadRequest(video, maxHeight, timeout) {
-      var url = '/videos/' + video.guid + '/download?';
+    function downloadRequest(video, maxHeight) {
+      var url = '/videos/' + video.id + '/download';
       if (maxHeight != null) {
-        url += 'maxHeight=' + maxHeight;
+        url = url + '?maxHeight=' + maxHeight;
       }
-
-      if (timeout != null) {
-        url += 'timeout=' + timeout;
-      }
-
       return agent.get(url);
     }
 
     beforeEach(function(done) {
       helper.series()
         .destroyAll(Video)
-        .destroyAll(VideoFormat)
         .createModels(Video, video)
         .end(function(err, results) {
           if (err) return done(err);
           video = results[results.length - 1];
-          video.formats.add(format1080);
-          video.formats.add(format720);
+          video.formats = [format1080, format720];
           video.save(done);
         });
     });
@@ -144,8 +137,7 @@ describe('VideosController', function() {
 
         helper.createModels(Video, video, function(err, results) {
           assert.ifError(err);
-          var video = results[results.length - 1];
-          downloadRequest(video, null, 0).expect(503).end(done);
+          downloadRequest(results[results.length - 1]).expect(503).end(done);
         });
       });
     });
@@ -156,7 +148,7 @@ describe('VideosController', function() {
 
     function updateRequest(video) {
       return agent
-        .put('/api/videos/' + video.guid)
+        .put('/api/videos/' + video.id)
         .send(video);
     }
 
@@ -166,9 +158,12 @@ describe('VideosController', function() {
 
       helper.series()
         .destroyAll(Video)
-        .destroyAll(VideoFormat)
         .createModels(Video, video)
-        .end(done);
+        .end(function(err, results) {
+          if (err) return done(err);
+          video = results[results.length - 1];
+          done();
+        });
     });
 
     it('should add a format', function(done) {
@@ -199,13 +194,7 @@ describe('VideosController', function() {
             assert.lengthOf(res.body.formats, 1);
             assert.equal(res.body.formats[0].videoUrl,
               video.formats[0].videoUrl);
-
-            // ensure #update() cleaned up orphaned formats
-            VideoFormat.find().exec(function(err, results) {
-              assert.ifError(err);
-              assert.lengthOf(results, 1);
-              done();
-            });
+            done();
           });
       };
 
@@ -221,7 +210,7 @@ describe('VideosController', function() {
     });
 
     it('should return a 404 if an non-existant video is specified', function(done) {
-      video.guid = Math.floor(video.guid / 2);
+      video._id = '507f191e810c19729de860ea';
       updateRequest(video).expect(404, done);
     });
   });

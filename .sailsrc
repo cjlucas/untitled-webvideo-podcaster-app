@@ -1,4 +1,9 @@
 {
+  "hooks": {
+    "orm": false,
+    "pubsub": false
+  },
+  
   "generators": {
     "modules": {}
   }

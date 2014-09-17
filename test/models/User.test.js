@@ -13,24 +13,22 @@ describe('UserModel', function() {
 
   describe('#create()', function() {
     it('should fail if email was not specified', function(done) {
-      User.create({password: 'password'})
-        .exec(function(err, user) {
-          assert.equal(user, null);
-          done();
-        });
+      User.create({password: 'password'}, function(err, user) {
+        assert.equal(user, null);
+        done();
+      });
     });
 
     it('should fail if password was not specified', function(done) {
-      User.create({email: 'email'})
-        .exec(function(err, user) {
-          assert.equal(user, null);
-          done();
+      User.create({email: 'email'}, function(err, user) {
+        assert.equal(user, null);
+        done();
         });
     });
 
     it('should save successfully if email and password were specified', function(done) {
-      User.create({email: 'fake.email@google.com', password: 'password'})
-        .exec(function(err, user) {
+      User.create({email: 'fake.email@google.com', password: 'password'},
+        function(err, user) {
           assert.equal(err, null);
           assert.ok(user);
           done();
@@ -39,8 +37,8 @@ describe('UserModel', function() {
 
     it('should encrypt given password', function(done) {
       var unencryptedPassword = 'password';
-      User.create({email: 'fake.email@google.com', password: unencryptedPassword})
-        .exec(function(err, user) {
+      User.create({email: 'fake.email@google.com', password: unencryptedPassword},
+        function(err, user) {
           assert.notEqual(user.password, unencryptedPassword);
           done();
         });
@@ -64,11 +62,8 @@ describe('UserModel', function() {
     beforeEach(function(done) {
         helper.series()
           .destroyAll(User)
-          .then(function (cb) {
-            User
-              .create({email: email, password: password})
-              .exec(cb)
-          }).end(done);
+          .createModels(User, {email: email, password: password})
+          .end(done);
     });
 
     it('should succeed if correct email and password given', function(done) {

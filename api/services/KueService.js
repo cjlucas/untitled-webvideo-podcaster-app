@@ -11,7 +11,7 @@ var jobs = kue.createQueue({
 module.exports = {
   refreshFeed: function(feed) {
     var opts = {
-      id: feed.guid,
+      id: feed.id,
       url: feed.toUrl(),
       title: feed.toUrl()
     };
@@ -22,7 +22,7 @@ module.exports = {
 
   refreshVideo: function(video) {
     var opts = {
-      id: video.guid,
+      id: video.id,
       url: video.toUrl(),
       title: video.toUrl()
     };

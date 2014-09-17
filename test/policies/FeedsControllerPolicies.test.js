@@ -44,18 +44,13 @@ describe('FeedsControllerPolicies', function() {
   });
 
   function adminOnlyApiRequest() {
-    var videos = [
-      helper.validVideoCriteria(),
-      helper.validVideoCriteria()
-    ];
-
     return agent
-      .post('/api/feeds/' + feed.guid + '/add_videos')
+      .post('/api/feeds/' + feed.id + '/add_videos')
   }
 
   function loginRequiredApiRequest(feed) {
     return agent
-      .get('/api/feeds/' + feed.guid + '/refresh')
+      .get('/api/feeds/' + feed.id + '/refresh')
   }
 
   describe('when not logged in', function() {
@@ -137,7 +132,7 @@ describe('FeedsControllerPolicies', function() {
           if (err) return done(err);
           associatedFeed = results[0];
           disassociatedFeed = results[1];
-          user.feeds.add(associatedFeed);
+          user.feeds.push(associatedFeed);
           user.save(done);
         });
       });
@@ -155,7 +150,6 @@ describe('FeedsControllerPolicies', function() {
             done();
           });
         });
-
     });
   });
 });
