@@ -20,6 +20,11 @@ describe('UsersController', function() {
   });
 
   describe('#create()', function() {
+    beforeEach(function(done) {
+      helper.destroyAll(User);
+      done();
+    });
+
     function createUserRequest(email, password) {
       return agent
         .post('/api/users/create')

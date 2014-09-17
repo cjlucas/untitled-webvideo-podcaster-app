@@ -56,7 +56,6 @@ describe('FeedsController', function() {
 
           videoIds = getIds(videos);
 
-          console.log(feed);
           // associate videos with feed
           for (var i = 0; i < videos.length; i++) {
             feed.videos.push(videos[i]);

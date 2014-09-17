@@ -20,18 +20,14 @@ var UsersController = {
         .json({error: 'email or password is missing.'});
     }
 
-    User.findOneByEmail(email).exec(function(err, user) {
-      if (user != null) {
-        return res
-          .status(500)
-          .json({error: 'User with that email already exists.'});
-      }
+    User.count({email: email}, function(err, count) {
+      if (err) return res.status(500).json({dbError: err});
+      if (count > 0) return res.status(400).json({error: 'User already exists'});
 
-      User.create({email: email, password: password})
-        .exec(function(err, user) {
-          if (err) return res.status(500).json({dbErr: err});
-          res.json(user);
-        });
+      User.create({email: email, password: password}, function(err, user) {
+        if (err) return res.status(500).json({dbErr: err});
+        res.json(user);
+      });
     });
   },
 
@@ -47,21 +43,16 @@ var UsersController = {
         return res.status(400).json({error: 'Invalid feed url'});
       }
 
-      User.findById(userId)
-        .then(function(user) {
-          var saveUser = function() {
-            user.save(function(err) {
-              if (err) res.status(500).json({dbError: err});
-              res.json(feed);
-            });
-          };
-          user.feeds.add(feed);
-          saveUser();
-          KueService.refreshFeed(feed);
-        })
-        .fail(function(err) {
-          res.status(500).json({dbError: err});
+      User.findById(userId).populate('feeds').exec(function(err, user) {
+        if (err) return res.status(500).json({dbError: err});
+
+        user.feeds.push(feed);
+        user.save(function(err) {
+          if (err) res.status(500).json({dbError: err});
+          res.json(feed);
         });
+        KueService.refreshFeed(feed);
+      });
     });
 
   },
