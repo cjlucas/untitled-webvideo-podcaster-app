@@ -30,14 +30,13 @@ module.exports = {
       if (retryCount == 0) {
         res.set('Retry-After', 2 * 60);
         return res.status(503).end();
-}
+      }
       retryCount--;
-    Video.findById(id)
-      .populate('formats', {sort: 'height DESC'})
-      .exec(function(err, video) {
-        if(err) return res.status(500).json({dbError: err});
 
-
+      Video.findById(id)
+        .populate('formats', {sort: 'height DESC'})
+        .exec(function(err, video) {
+          if(err) return res.status(500).json({dbError: err});
           if (!video) return res.status(404).json({err: 'Video not found'});
 
           if (video.formats.length == 0) {

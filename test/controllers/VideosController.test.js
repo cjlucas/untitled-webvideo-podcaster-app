@@ -34,10 +34,14 @@ describe('VideosController', function() {
       videoUrl: 'http://example.org?vid=2'
     };
 
-    function downloadRequest(video, maxHeight) {
-      var url = '/videos/' + video.id + '/download';
+    function downloadRequest(video, maxHeight, timeout) {
+      var url = '/videos/' + video.id + '/download?';
       if (maxHeight != null) {
-        url = url + '?maxHeight=' + maxHeight;
+        url += 'maxHeight=' + maxHeight;
+      }
+
+      if (timeout != null) {
+        url += 'timeout=' + timeout;
       }
       return agent.get(url);
     }
@@ -103,7 +107,7 @@ describe('VideosController', function() {
       });
     });
 
-    describe('when url for requested format is not valid', function() {
+    describe('when url for requested format is stale', function() {
       var mitm;
       before(function(done) {
         // intercept the HEAD request and simulate an expired video link
@@ -137,7 +141,8 @@ describe('VideosController', function() {
 
         helper.createModels(Video, video, function(err, results) {
           assert.ifError(err);
-          downloadRequest(results[results.length - 1]).expect(503).end(done);
+          var video = results[results.length - 1];
+          downloadRequest(video, null, 0).expect(503).end(done);
         });
       });
     });
