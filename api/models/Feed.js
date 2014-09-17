@@ -80,66 +80,6 @@ function urlForFeed(feed) {
  * Schema
  */
 
-//var FeedModel = {
-//  attributes: {
-//    guid: {
-//      type: 'integer',
-//      index: true
-//    },
-//
-//    site: {
-//      type: 'string',
-//      enum: ['youtube'],
-//      required: true
-//    },
-//
-//    feedType: {
-//      type: 'string',
-//      enum: ['channel'],
-//      required: true
-//    },
-//
-//    feedId: {
-//      type: 'string',
-//      required: true
-//    },
-//
-//    users: {
-//      collection: 'user',
-//      via: 'feeds'
-//    },
-//
-//    videos: {
-//      collection: 'video',
-//      via: 'feed'
-//    },
-//
-//    toUrl: function() {
-//      return urlForFeed(this);
-//    },
-//
-//    toJSON: function() {
-//      var obj = this.toObject();
-//      obj.url = this.toUrl();
-//      return obj;
-//    }
-//
-//  },
-//
-//  beforeCreate: function(criteria, callback) {
-//    GuidService.getGuid(Feed, function(guid) {
-//      criteria.guid = guid;
-//      callback();
-//    });
-//  },
-//
-//  fromUrl: function(url, callback) {
-//    return feedForUrl(url, callback);
-//  }
-//};
-//
-//module.exports = FeedModel;
-
 var validSites = ['youtube'];
 var validFeedTypes = ['channel'];
 

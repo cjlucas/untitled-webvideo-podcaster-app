@@ -40,7 +40,7 @@ module.exports = {
    * Request body: A single Video object
    *
    * Video definition:
-   *   guid: the guid of an existing Video object
+   *   id: the id of an existing Video object
    *   videoId: site-specific video id
    *   title
    *   description
