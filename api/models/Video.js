@@ -91,9 +91,17 @@ var VideoSchema = new Schema({
     {
       width: {type: Number, index: true},
       height: {type: Number, index: true},
-      videoUrl: {type:String, required: true}
+      videoUrl: {type: String, required: true}
     }
   ]
+});
+
+VideoSchema.set('toJSON', {
+  transform: function(doc, ret, options) {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+  }
 });
 
 VideoSchema.methods.toUrl = function() {

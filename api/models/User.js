@@ -97,6 +97,14 @@ var UserSchema = new Schema({
   feeds: [{type: Schema.Types.ObjectId, ref: 'Feed'}]
 });
 
+UserSchema.set('toJSON', {
+  transform: function(doc, ret, options) {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+  }
+});
+
 /**
  * Middleware
  */
