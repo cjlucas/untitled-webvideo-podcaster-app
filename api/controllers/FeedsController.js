@@ -45,12 +45,12 @@ module.exports = {
       .exec(function(err, feed) {
         if (err) return res.status(500).json({dbError: err});
 
+        // update existing videos, then remove them from array
         feed.videos.forEach(function(existingVideo) {
           // remove updated video from array
           var updatedVideoCriteria =
             getVideoWithId(existingVideo.videoId, videos);
           videos.splice(videos.indexOf(updatedVideoCriteria), 1);
-
 
           Video.update(existingVideo.id, updatedVideoCriteria,
             function(err, videos) {
@@ -58,7 +58,14 @@ module.exports = {
           });
         });
 
+        // associate new videos with feed site
+        videos.forEach(function(video) {
+          video.site = feed.site;
+        });
+
+        // create new videos
         Video.create(videos, function(err) {
+          console.log(err);
           if (err) return res.status(500).json({dbError: err});
 
           for (var i = 1; i < arguments.length; i++) {
