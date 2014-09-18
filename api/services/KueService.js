@@ -8,8 +8,12 @@ var jobs = kue.createQueue({
   }
 });
 
+var noop = function(){};
+
 module.exports = {
   refreshFeed: function(feed, callback) {
+    callback = callback == null ? noop : callback;
+
     if (feed.id == null) {
       var err = new Error('feed id is missing');
       return callback(err, null);
@@ -28,6 +32,8 @@ module.exports = {
   },
 
   refreshVideo: function(video, callback) {
+    callback = callback == null ? noop : callback;
+
     if (video.id == null) {
       var err = new Error('video id is missing');
       return callback(err, null);
