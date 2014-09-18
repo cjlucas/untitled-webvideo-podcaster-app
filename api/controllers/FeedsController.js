@@ -91,8 +91,10 @@ module.exports = {
    */
 
   refresh: function(req, res) {
-    KueService.refreshFeed(req.feed);
-    res.status(200).end();
+    KueService.refreshFeed(req.feed, function(err, jobId) {
+      if (err) return res.status(500).json({error: err});
+      res.status(200).end();
+    });
   }
 };
 

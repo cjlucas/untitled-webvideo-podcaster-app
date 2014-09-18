@@ -49,9 +49,11 @@ var UsersController = {
         user.feeds.push(feed);
         user.save(function(err) {
           if (err) res.status(500).json({dbError: err});
-          res.json(feed);
+          KueService.refreshFeed(feed, function(err, job) {
+            res.json(feed);
+          });
         });
-        KueService.refreshFeed(feed);
+
       });
     });
 

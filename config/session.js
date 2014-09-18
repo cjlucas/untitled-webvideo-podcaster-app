@@ -41,7 +41,7 @@ module.exports.session = {
   * session store that can be shared across multiple Sails.js servers        *
   ***************************************************************************/
 
-  adapter: process.env.NODE_ENV == 'test' ? undefined : 'redis',
+  adapter: process.env.NODE_ENV === 'test' ? undefined : 'redis',
 
   /***************************************************************************
   *                                                                          *

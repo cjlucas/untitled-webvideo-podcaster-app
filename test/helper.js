@@ -2,6 +2,7 @@ var SailsApp = require('sails').Sails;
 var request = require('supertest');
 var async = require('async');
 var rc = require('rc');
+var redis = require('redis');
 
 function setSails(sails) {
   module.exports.sails = sails;
@@ -71,21 +72,6 @@ function Series() {
       Model.remove(cb);
     });
 
-//    Model.find().exec(function(err, models) {
-//      if (err) throw err;
-//
-//      var destroyModel = function(model) {
-//        return function(cb) {
-//          model.destroy(function(err) {
-//            cb(err, "destroyed: " + model);
-//          });
-//        }
-//      };
-//
-//      models.forEach(function(model) {
-//       this.push(destroyModel(model));
-//      }, tasks);
-//    });
     self.decrNumRunningTaskProducers();
 
     return this;
@@ -115,12 +101,14 @@ function TestHelper() {
   this.sailsLiftedCount = 0;
   this.agent = null;
   this.sails = null;
+  this.redisClient = null;
 
   /**
    * Lift Sails
    * @param callback
    */
   this.liftSails = function(callback) {
+    var self = this;
     if (this.sailsLiftedCount > 0) return callback();
 
     this.sailsLiftedCount++;
@@ -132,6 +120,11 @@ function TestHelper() {
         return callback(err);
       }
 
+      self.redisClient = redis.createClient(
+        sails.config.redis.port,
+        sails.config.redis.host
+      );
+
       setSails(sails);
       callback(err, sails);
     });
@@ -142,9 +135,30 @@ function TestHelper() {
    * @param callback
    */
   this.lowerSails = function(callback) {
+    var self = this;
     if (--this.sailsLiftedCount > 0) return callback();
 
-    this.sails.lower(callback);
+    var lower = function() {
+      self.redisClient.quit();
+      this.sails.lower(callback);
+    };
+
+    var delKey = function(key) {
+      return function(cb) {
+        self.redisClient.del(key, cb);
+      };
+    };
+
+    // cleanup redis database
+    var pattern = this.sails.config.redis.prefix + ':*';
+    self.redisClient.keys(pattern, function(err, keys) {
+      callbacks = [];
+      keys.forEach(function(key) {
+        callbacks.push(delKey(key));
+      });
+
+      async.parallel(callbacks, lower);
+    });
   };
 
   this.getAgent = function(sails) {

@@ -9,26 +9,40 @@ var jobs = kue.createQueue({
 });
 
 module.exports = {
-  refreshFeed: function(feed) {
+  refreshFeed: function(feed, callback) {
+    if (feed.id == null) {
+      var err = new Error('feed id is missing');
+      return callback(err, null);
+    }
+
     var opts = {
       id: feed.id,
       url: feed.toUrl(),
       title: feed.toUrl()
     };
-    jobs
+    var job = jobs
       .create('feed parser', opts)
-      .save()
+      .save();
+
+    callback(null, job);
   },
 
-  refreshVideo: function(video) {
+  refreshVideo: function(video, callback) {
+    if (video.id == null) {
+      var err = new Error('video id is missing');
+      return callback(err, null);
+    }
+
     var opts = {
       id: video.id,
       url: video.toUrl(),
       title: video.toUrl()
     };
 
-    jobs
+    var job = jobs
       .create('refresh video data', opts)
       .save();
+
+    callback(null, job);
   }
 };
