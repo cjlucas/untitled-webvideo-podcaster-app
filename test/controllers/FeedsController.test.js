@@ -132,7 +132,7 @@ describe('FeedsController', function() {
 
   });
 
-  describe.only('#addVideos()', function() {
+  describe('#addVideos()', function() {
     function addVideosRequest(feedId, videos) {
       return agent
         .post('/api/feeds/' + feedId + '/add_videos')
