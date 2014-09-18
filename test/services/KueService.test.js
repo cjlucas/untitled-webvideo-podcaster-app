@@ -3,7 +3,7 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 var Mitm   = require('mitm');
 
-describe('KueService', function() {
+describe.only('KueService', function() {
   var agent;
 
   before(function (done) {
@@ -51,8 +51,8 @@ describe('KueService', function() {
       });
     });
 
-    describe.only('when given a feed that is already queued', function() {
-      it('should return an error', function(done) {
+    describe('when submitting the same feed multiple times', function() {
+      it('should return an error if the job is still queued', function(done) {
         var queueSecondJob = function() {
           KueService.refreshFeed(feed, function(err, job) {
             assert.isNotNull(err);
@@ -61,11 +61,36 @@ describe('KueService', function() {
         };
 
         KueService.refreshFeed(feed, queueSecondJob);
-      })
+      });
+
+      it('should succeed if the job doesnt exist in the queue', function(done) {
+        var queueSecondJob = function() {
+          // simulate first job being dequeued
+          KueService.removeJobs();
+          KueService.refreshFeed(feed, function(err, job) {
+            assert.ifError(err);
+            assert.isNotNull(job);
+            done();
+          });
+        };
+
+        KueService.refreshFeed(feed, queueSecondJob);
+      });
     });
   });
 
   describe('#refreshVideo()', function() {
+    var video;
+    beforeEach(function(done) {
+      helper.series()
+        .destroyAll(Video)
+        .createModels(Video, helper.validVideoCriteria())
+        .end(function(err, results) {
+          video = results[results.length - 1];
+          done();
+        });
+    });
+
     describe('when given an unsaved video', function() {
       it('error should not be null', function(done) {
         var video = helper.validVideoCriteria();
@@ -77,18 +102,6 @@ describe('KueService', function() {
     });
 
     describe('when given a valid video', function() {
-      var video;
-
-      beforeEach(function(done) {
-        helper.series()
-          .destroyAll(Video)
-          .createModels(Video, helper.validVideoCriteria())
-          .end(function(err, results) {
-            video = results[results.length - 1];
-            done();
-          });
-      });
-
       it('should contain valid job data', function(done) {
         KueService.refreshVideo(video, function(err, job) {
           assert.ifError(err);
@@ -96,6 +109,33 @@ describe('KueService', function() {
           done();
         });
       })
+    });
+
+    describe('when submitting the same video multiple times', function() {
+      it('should return an error if the job is still queued', function(done) {
+        var queueSecondJob = function() {
+          KueService.refreshVideo(video, function(err, job) {
+            assert.isNotNull(err);
+            done();
+          });
+        };
+
+        KueService.refreshVideo(video, queueSecondJob);
+      });
+
+      it('should succeed if the job doesnt exist in the queue', function(done) {
+        var queueSecondJob = function() {
+          // simulate first job being dequeued
+          KueService.removeJobs();
+          KueService.refreshVideo(video, function(err, job) {
+            assert.ifError(err);
+            assert.isNotNull(job);
+            done();
+          });
+        };
+
+        KueService.refreshVideo(video, queueSecondJob);
+      });
     });
   });
 });
