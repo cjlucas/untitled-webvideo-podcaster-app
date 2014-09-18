@@ -15,10 +15,21 @@ describe('KueService', function() {
   after(function (done) {
     helper.lowerSails(done);
     agent = null;
-    redisClient.quit();
   });
 
   describe('#refreshFeed()', function() {
+    var feed;
+    beforeEach(function(done) {
+      helper.series()
+        .destroyAll(Feed)
+        .createModels(Feed, helper.validFeedCriteria())
+        .end(function(err, results) {
+          if (err) return done(err);
+          feed = results[results.length - 1];
+          done();
+        });
+    });
+
     describe('when given an unsaved feed', function() {
       it('error should not be null', function(done) {
         var feed = helper.validFeedCriteria();
@@ -30,17 +41,6 @@ describe('KueService', function() {
     });
 
     describe('when given a valid feed', function() {
-      var feed;
-      beforeEach(function(done) {
-        helper.series()
-          .destroyAll(Feed)
-          .createModels(Feed, helper.validFeedCriteria())
-          .end(function(err, results) {
-            if (err) return done(err);
-            feed = results[results.length - 1];
-            done();
-          });
-      });
 
       it('should contain valid job data', function(done) {
         KueService.refreshFeed(feed, function(err, job) {
@@ -49,7 +49,20 @@ describe('KueService', function() {
           done();
         });
       });
-    })
+    });
+
+    describe.only('when given a feed that is already queued', function() {
+      it('should return an error', function(done) {
+        var queueSecondJob = function() {
+          KueService.refreshFeed(feed, function(err, job) {
+            assert.isNotNull(err);
+            done();
+          });
+        };
+
+        KueService.refreshFeed(feed, queueSecondJob);
+      })
+    });
   });
 
   describe('#refreshVideo()', function() {
