@@ -15,29 +15,21 @@ function RefreshVideoDataWorker(apiHost, apiPort, apiToken, videoId, videoUrl) {
     var self = this;
     job = j;
 
-    var cmd = 'youtube-dl -j ' + this.videoUrl;
-    job.log('Executing: ' + cmd);
-    exec(cmd, function(err, stdout, sterr) {
-      if (err) return done(err);
-      job.log('Finished executing');
+    var scraper = new common.YoutubeDLScraper(this.videoUrl);
 
-      var data = JSON.parse('[' + stdout.toString() + ']');
-      var video = common.parseYoutubeDlJSON(data)[0];
-
-      job.log('Filtering video formats');
-      video.formats = common.filterVideoFormats(video.formats);
-
+    scraper.on('video', function(video) {
       var url = '/api/videos/' + self.videoId;
       job.log('PUT %s', url);
       self.client.put(url, video, function(err, res, body) {
         if (err) return done(err);
 
         job.log('Request response code: ' + res.statusCode);
-        done();
-      })
+      });
     });
 
+    scraper.on('done', done);
 
+    scraper.scrape();
   }
 }
 
