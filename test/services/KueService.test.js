@@ -3,7 +3,7 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 var Mitm   = require('mitm');
 
-describe.only('KueService', function() {
+describe('KueService', function() {
   var agent;
 
   before(function (done) {
