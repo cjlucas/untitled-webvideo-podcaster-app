@@ -17,8 +17,12 @@ module.exports = {
    * environment (see config/connections.js and config/models.js )           *
    ***************************************************************************/
 
-  models: {
-     connection: 'openShiftMysql'
+  mongo: {
+    database: 'podcaster',
+    host: process.env.OPENSHIFT_MONGODB_DB_HOST,
+    port: process.env.OPENSHIFT_MONGODB_DB_PORT,
+    username: process.env.OPENSHIFT_MONGODB_DB_USERNAME,
+    password: process.env.OPENSHIFT_MONGODB_DB_PASSWORD
   },
 
   redis: {

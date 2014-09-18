@@ -5,7 +5,7 @@ function setupMongoose(sails) {
   var database = sails.config.mongo.database;
   var host = sails.config.mongo.host || 'localhost';
   var port = sails.config.mongo.port || 27017;
-  var user = sails.config.mongo.user;
+  var user = sails.config.mongo.username;
   var password = sails.config.mongo.password;
 
 
