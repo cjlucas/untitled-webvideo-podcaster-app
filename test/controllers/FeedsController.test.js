@@ -132,7 +132,7 @@ describe('FeedsController', function() {
 
   });
 
-  describe('#addVideos()', function() {
+  describe.only('#addVideos()', function() {
     function addVideosRequest(feedId, videos) {
       return agent
         .post('/api/feeds/' + feedId + '/add_videos')
@@ -240,7 +240,31 @@ describe('FeedsController', function() {
                   done();
                 });
             });
-        })
+        });
+    });
+
+    it('should append new videos to feed with existing videos', function(done) {
+      var vid1 = helper.validVideoCriteria();
+      var vid2 = helper.validVideoCriteria();
+      vid1.videoId = 'vid1';
+      vid2.videoId = 'vid2';
+
+      var addSecondVideo = function() {
+        addVideosRequest(feed.id, [vid2])
+          .expect(200)
+          .end(function(err, res) {
+            assert.ifError(err);
+            Feed.findById(feed.id)
+              .populate('videos')
+              .exec(function(err, feed) {
+                assert.ifError(err);
+                assert.lengthOf(feed.videos, 2);
+                done();
+              });
+          });
+      };
+
+      addVideosRequest(feed.id, [vid1]).end(addSecondVideo);
     });
   });
 });

@@ -36,8 +36,8 @@ module.exports = {
    */
 
   addVideos: function(req, res) {
-    var videos = req.param('videos');
-    var videoIds = videos.map(function(video) {
+    var newVideos = req.param('videos');
+    var videoIds = newVideos.map(function(video) {
       return video.videoId;
     });
 
@@ -49,8 +49,15 @@ module.exports = {
         feed.videos.forEach(function(existingVideo) {
           // remove updated video from array
           var updatedVideoCriteria =
-            getVideoWithId(existingVideo.videoId, videos);
-          videos.splice(videos.indexOf(updatedVideoCriteria), 1);
+            getVideoWithId(existingVideo.videoId, newVideos);
+
+          // continue if updated criteria doesn't exist in new videos
+          if (updatedVideoCriteria == null) {
+            return;
+          }
+
+          // remove updated video from array of new videos
+          newVideos.splice(newVideos.indexOf(updatedVideoCriteria), 1);
 
           Video.update(existingVideo.id, updatedVideoCriteria,
             function(err, videos) {
@@ -59,12 +66,12 @@ module.exports = {
         });
 
         // associate new videos with feed site
-        videos.forEach(function(video) {
+        newVideos.forEach(function(video) {
           video.site = feed.site;
         });
 
         // create new videos
-        Video.create(videos, function(err) {
+        Video.create(newVideos, function(err) {
           console.log(err);
           if (err) return res.status(500).json({dbError: err});
 
@@ -82,7 +89,6 @@ module.exports = {
             }
           });
         });
-
       });
   },
 
