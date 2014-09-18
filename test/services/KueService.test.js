@@ -8,12 +8,6 @@ describe('KueService', function() {
 
   before(function (done) {
     helper.liftSails(function (err, sails) {
-      redisPrefix = sails.config.redis.prefix;
-      redisClient = require('redis').createClient(
-        sails.config.redis.port,
-        sails.config.redis.host
-      );
-
       done();
     });
   });
