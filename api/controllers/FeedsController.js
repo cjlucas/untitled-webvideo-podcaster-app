@@ -72,7 +72,6 @@ module.exports = {
 
         // create new videos
         Video.create(newVideos, function(err) {
-          console.log(err);
           if (err) return res.status(500).json({dbError: err});
 
           for (var i = 1; i < arguments.length; i++) {
@@ -97,8 +96,8 @@ module.exports = {
    */
 
   refresh: function(req, res) {
-    KueService.refreshFeed(req.feed, function(err, jobId) {
-      if (err) return res.status(500).json({error: err});
+    KueService.refreshFeed(req.feed, function(err, job) {
+      if (err) return res.status(500).json({error: err.message});
       res.status(200).end();
     });
   }
