@@ -41,7 +41,7 @@ module.exports = {
       return video.videoId;
     });
 
-    Feed.findById(req.feed.id).populate('videos', {videoId: videoIds})
+    Feed.findById(req.feed.id).populate('videos')
       .exec(function(err, feed) {
         if (err) return res.status(500).json({dbError: err});
 

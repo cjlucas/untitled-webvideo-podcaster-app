@@ -10,14 +10,23 @@ function RefreshVideoDataWorker(apiHost, apiPort, apiToken, videoId, videoUrl) {
   this.videoId = videoId;
   this.videoUrl = videoUrl;
   this.client = common.newRequestClient(apiHost, apiPort, apiToken);
+  var self = this;
 
   this.work = function(j, done) {
-    var self = this;
     job = j;
 
     var scraper = new common.YoutubeDLScraper(this.videoUrl);
 
     scraper.on('video', function(video) {
+    });
+
+    scraper.on('done', done);
+
+    scraper.scrape();
+  };
+
+  this.onVideo = function(video) {
+    var uploadVideo = function() {
       var url = '/api/videos/' + self.videoId;
       job.log('PUT %s', url);
       self.client.put(url, video, function(err, res, body) {
@@ -25,12 +34,15 @@ function RefreshVideoDataWorker(apiHost, apiPort, apiToken, videoId, videoUrl) {
 
         job.log('Request response code: ' + res.statusCode);
       });
+    };
+
+    var tasks = [];
+    video.formats.forEach(function(format) {
+      tasks.push(common.fetchContentLengthTask(format));
     });
 
-    scraper.on('done', done);
-
-    scraper.scrape();
-  }
+    async.parallel(tasks, uploadVideo);
+  };
 }
 
 module.exports = RefreshVideoDataWorker;

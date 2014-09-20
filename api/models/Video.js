@@ -31,7 +31,8 @@ var VideoSchema = new Schema({
     {
       width: {type: Number, index: true},
       height: {type: Number, index: true},
-      videoUrl: {type: String, required: true}
+      videoUrl: {type: String, required: true},
+      size: Number
     }
   ]
 });

@@ -1,4 +1,5 @@
-var request = require('request-json');
+var request = require('request-json'); // TODO: use json:true with request
+var req     = require('request');
 var spawn   = require('child_process').spawn;
 var util    = require('util');
 var EventEmitter = require('events').EventEmitter;
@@ -44,6 +45,27 @@ function newRequestClient(host, port, token) {
 
 module.exports.newRequestClient = newRequestClient;
 
+function getContentLength(url, callback) {
+  var opts = {timeout: 5000};
+  req.head(url, opts, function(err, res) {
+    if (err) return callback(err, null);
+    return callback(null, res.headers['content-length']);
+  });
+}
+
+module.exports.getContentLength = getContentLength;
+
+function fetchContentLengthTask(format) {
+  return function(cb) {
+    getContentLength(format.videoUrl, function(err, contentLength) {
+      if (!err) format.size = contentLength;
+      cb();
+    });
+  };
+}
+
+module.exports.fetchContentLengthTask = fetchContentLengthTask;
+
 function filterVideoFormats(formats) {
   return formats.filter(function(format) {
     // filter audio formats
@@ -70,10 +92,9 @@ function filterVideoFormats(formats) {
   });
 }
 
-module.exports.filterVideoFormats = filterVideoFormats;
-
 function buildYoutubeDLScraperArgs(url, options) {
   args = [];
+  args.push('--ignore-errors');
   args.push('-j');
   args.push(url);
 
@@ -125,9 +146,10 @@ YoutubeDLScraper = function(url, options) {
     });
 
     child.on('close', function(code) {
-      if (stderr.length == 0) return self.emit('done');
-
-      self.emit('done', new Error(stderr));
+      self.emit('done');
+//      if (stderr.length == 0) return self.emit('done');
+//
+//      self.emit('done', new Error(stderr));
     });
   };
 
