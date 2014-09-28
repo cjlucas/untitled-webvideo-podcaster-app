@@ -77,7 +77,7 @@ function FeedParserWorker(apiHost, apiPort, apiToken, feedId, feedUrl) {
       };
 
       var afterFormatSizeFetches = function () {
-        const LIMIT = 10;
+        const LIMIT = 100;
         var cursor = 0;
         var tasks = [];
         while (self.videos.length - cursor > 0) {
