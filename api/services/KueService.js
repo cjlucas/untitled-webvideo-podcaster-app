@@ -8,11 +8,19 @@ var queue = kue.createQueue({
   }
 });
 
-// remove job from internal job array
-queue.on('job complete', function(id, result) {
-  kue.Job.get(id, function(err, job) {
+function getJobAndRemove(jobId) {
+  kue.Job.get(jobId, function(err, job) {
     removeJob(job);
-  })
+  });
+}
+
+// remove completed/failed job from internal job array
+queue.on('job complete', function(id, result) {
+  getJobAndRemove(id);
+});
+
+queue.on('job error', function(id, result) {
+  getJobAndRemove(id);
 });
 
 const REFRESH_FEED_JOB_TYPE = 'feed parser';
