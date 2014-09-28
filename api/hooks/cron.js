@@ -5,8 +5,8 @@ module.exports = function(sails) {
     initialize: function(cb) {
       if (process.env.NODE_ENV === 'test') return cb();
 
-      // Update feeds
-      new CronJob('0 */4 * * * *', KueService.refreshAllFeeds).start();
+      // Update feeds every 4 hours
+      new CronJob('0 0 */4 * * *', KueService.refreshAllFeeds).start();
 
       cb();
     }
