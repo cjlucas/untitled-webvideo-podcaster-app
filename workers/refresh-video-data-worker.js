@@ -1,3 +1,4 @@
+var async = require('async');
 var exec = require('child_process').exec;
 var fs = require('fs');
 var temp = require('temp');
@@ -11,6 +12,7 @@ function RefreshVideoDataWorker(apiHost, apiPort, apiToken, videoId, videoUrl) {
   this.videoUrl = videoUrl;
   this.client = common.newRequestClient(apiHost, apiPort, apiToken);
   var self = this;
+  var job;
 
   this.work = function(j, done) {
     job = j;
@@ -18,10 +20,13 @@ function RefreshVideoDataWorker(apiHost, apiPort, apiToken, videoId, videoUrl) {
     var scraper = new common.YoutubeDLScraper(this.videoUrl);
 
     scraper.on('video', function(video) {
+      job.log('Received video data');
+      self.onVideo(video);
     });
 
     scraper.on('done', done);
 
+    job.log('Scraping %s', this.videoUrl);
     scraper.scrape();
   };
 
@@ -41,6 +46,7 @@ function RefreshVideoDataWorker(apiHost, apiPort, apiToken, videoId, videoUrl) {
       tasks.push(common.fetchContentLengthTask(format));
     });
 
+    job.log('Fetching content lengths for %d urls', video.formats.length);
     async.parallel(tasks, uploadVideo);
   };
 }
