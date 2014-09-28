@@ -45,7 +45,7 @@ module.exports = {
           }
 
           // check if video url is still alive
-          var videoUrl = formatWithMaxHeight(maxHeight, video.formats).videoUrl;
+          var videoUrl = video.formatWithMaxHeight(maxHeight).videoUrl;
           var reqOptions = {
             url: videoUrl,
             method: 'HEAD',
@@ -105,25 +105,3 @@ module.exports = {
     });
   }
 };
-
-function formatWithMaxHeight(maxHeight, formats) {
-  formats.sort(function(a, b) {
-    return a.height - b.height;
-  });
-
-  // return the largest format if max height not given
-  if (maxHeight == null) {
-    return formats[formats.length - 1];
-  }
-
-  var format = formats[0];
-
-  formats.forEach(function(f) {
-    if (f.height <= maxHeight
-      && (format == null || format.height < f.height)) {
-      format = f;
-    }
-  });
-
-  return format;
-}

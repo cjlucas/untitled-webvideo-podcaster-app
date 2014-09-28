@@ -5,15 +5,16 @@ rss(version='2.0', xmlns:itunes='http://www.itunes.com/dtds/podcast-1.0.dtd')
         link= feed.toUrl()
         description Placeholder
         each video in feed.videos
+            - var format = video.formatWithMaxHeight(720)
             item
                 title= video.title
                 itunes:image(href=video.image)
                 description= video.description
                 itunes:summary= video.description
                 enclosure(
-                    url='http://#{address.host}:#{address.port}/videos/#{video.id}/download?maxHeight=720',
+                    url= videoUrl(video)
                     type='video/mp4'
-                    length=video.duration
+                    length=format.size
                 )
 
                 pubDate= video.uploadDate.toUTCString()

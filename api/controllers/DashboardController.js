@@ -36,8 +36,18 @@ module.exports = {
 
       var address = PublicAddressService.getPublicAddress();
 
+      var videoUrl = function(video) {
+        return 'http://'
+          + address.host
+          + ':'
+          + address.port
+          + '/videos/'
+          + video.id
+          + '/download?maxHeight=720'
+      };
+
       res.set('Content-Type', 'application/rss+xml');
-      res.render('feedxml', {feed: feed, address: address, layout: false});
+      res.render('feedxml', {feed: feed, videoUrl: videoUrl, layout: false});
     })
   }
 };
