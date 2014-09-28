@@ -102,6 +102,24 @@ module.exports = {
     callback(null, job);
   },
 
+  refreshAllFeeds: function(callback) {
+    callback = callback == null ? noop : callback;
+
+    Feed.find(function(err, feeds) {
+      if (err) return callback(err);
+
+      var tasks = [];
+      feeds.forEach(function(feed) {
+        var task = function(cb) {
+          KueService.refreshFeed(feed, cb);
+        }
+        tasks.push(task);
+      });
+
+      async.series(tasks, callback);
+    });
+  },
+
   refreshVideo: function(video, callback) {
     callback = callback == null ? noop : callback;
 

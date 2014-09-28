@@ -79,6 +79,43 @@ describe('KueService', function() {
     });
   });
 
+  describe('#refreshAllFeeds()', function() {
+    describe('when no feeds exist', function() {
+      before(function(done) {
+        helper.destroyAll(Feed);
+        done();
+      });
+
+      it('should return an empty array', function(done) {
+        KueService.refreshAllFeeds(function(err, jobs) {
+          assert.isArray(jobs);
+          assert.lengthOf(jobs, 0);
+          done();
+        });
+      });
+    });
+
+    describe('when a feeds exist', function() {
+      beforeEach(function(done) {
+        helper.series()
+          .destroyAll(Feed)
+          .end(done);
+      });
+
+      it('should return an array of job ids', function(done) {
+        var performTests = function() {
+          KueService.refreshAllFeeds(function(err, jobs) {
+            assert.isArray(jobs);
+            assert.lengthOf(jobs, 1);
+            done();
+          });
+        };
+
+        helper.createModels(Feed, helper.validFeedCriteria(), performTests);
+      });
+    });
+  });
+
   describe('#refreshVideo()', function() {
     var video;
     beforeEach(function(done) {
