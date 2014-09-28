@@ -87,6 +87,7 @@ var FeedSchema = new Schema({
   site: {type: String, enum: validSites, required: true},
   feedType: {type: String, enum: validFeedTypes, required: true},
   feedId: {type: String, required: true},
+  lastScannedAt: Date,
   videos: [{type: Schema.Types.ObjectId, ref: 'Video'}]
 });
 

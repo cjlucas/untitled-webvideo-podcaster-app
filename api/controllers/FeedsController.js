@@ -78,6 +78,9 @@ module.exports = {
             feed.videos.push(arguments[i]);
           }
 
+          // TODO: find a better place to update lastScannedAt
+          feed.lastScannedAt = Date.now();
+
           feed.save(function(err) {
             if (err) {
               return res
