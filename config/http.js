@@ -50,8 +50,14 @@ module.exports.http = {
     sessionBlocker: function (req, res, next) {
       var sessionMiddleware = sails.config.http.middleware.session;
 
-      if (req.headers['user-agent'] == null) req.session = {}; return next();
+      console.log(req.headers['user-agent']);
+      if (req.headers['user-agent'] == null) {
+        console.log('skipping session middleware');
+        req.session = {};
+        return next();
+      }
 
+      console.log('creating session');
       return sessionMiddleware(req, res, next);
     }
   }
