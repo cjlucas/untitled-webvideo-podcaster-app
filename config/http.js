@@ -21,6 +21,11 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
+  customMiddleware: function(app) {
+    // Mount kue app
+    app.use('/kue/', require('kue').app);
+  },
+
   middleware: {
 
     /***************************************************************************
@@ -64,20 +69,6 @@ module.exports.http = {
       return sessionMiddleware(req, res, next);
     }
   }
-
-
-  /***************************************************************************
-  *                                                                          *
-  * The body parser that will handle incoming multipart HTTP requests. By    *
-  * default as of v0.10, Sails uses                                          *
-  * [skipper](http://github.com/balderdashy/skipper). See                    *
-  * http://www.senchalabs.org/connect/multipart.html for other options.      *
-  *                                                                          *
-  ***************************************************************************/
-
-    // bodyParser: require('skipper')
-
-  // },
 
   /***************************************************************************
   *                                                                          *
