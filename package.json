@@ -37,7 +37,8 @@
     "sails": "~0.10.5",
     "supertest": "^0.13.0",
     "temp": "^0.8.1",
-    "cron": "~1.0.5"
+    "cron": "~1.0.5",
+    "connect-mongo": "~0.4.1"
   },
   "scripts": {
     "start": "node app.js --prod",

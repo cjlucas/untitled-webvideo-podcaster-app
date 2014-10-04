@@ -36,12 +36,10 @@ module.exports = {
   port: process.env['OPENSHIFT_NODEJS_PORT'],
 
   session: {
-    adapter: 'redis',
-    prefix: 'podcaster:sessions:',
-    host: process.env['OPENSHIFT_REDIS_DB_HOST'],
-    port: process.env['OPENSHIFT_REDIS_DB_PORT'],
-    pass: process.env['OPENSHIFT_REDIS_DB_PASSWORD'],
-    secret: process.env['OPENSHIFT_SECRET_TOKEN']
+    host: process.env.OPENSHIFT_MONGODB_DB_HOST,
+    port: process.env.OPENSHIFT_MONGODB_DB_PORT,
+    username: process.env.OPENSHIFT_MONGODB_DB_USERNAME,
+    password: process.env.OPENSHIFT_MONGODB_DB_PASSWORD
   },
 
   publicHost: 'podcaster-cjlucas.rhcloud.com',

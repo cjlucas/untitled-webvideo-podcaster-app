@@ -12,6 +12,8 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.session.html
  */
 
+// NOTE: Per ENV session settings are stored in config/env
+
 module.exports.session = {
 
   /***************************************************************************
@@ -41,7 +43,10 @@ module.exports.session = {
   * session store that can be shared across multiple Sails.js servers        *
   ***************************************************************************/
 
-  adapter: process.env.NODE_ENV === 'test' ? undefined : 'redis',
+  adapter: process.env.NODE_ENV === 'test' ? undefined : 'mongo',
+  db: 'podcaster',
+  prefix: 'sessions',
+  auto_reconnect: true
 
   /***************************************************************************
   *                                                                          *
@@ -57,7 +62,7 @@ module.exports.session = {
 //  ttl: <redis session TTL in seconds>,
 //  db: 0,
 //  pass: <redis auth password>
-  prefix: 'podcaster:sessions:'
+//  prefix: 'podcaster:sessions:'
 
 
   /***************************************************************************
