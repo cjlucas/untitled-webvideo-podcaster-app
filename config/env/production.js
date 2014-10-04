@@ -27,9 +27,9 @@ module.exports = {
 
   redis: {
     prefix: 'podcaster',
-    host: process.env['OPENSHIFT_REDIS_DB_HOST'],
-    port: process.env['OPENSHIFT_REDIS_DB_PORT'],
-    password: process.env['OPENSHIFT_REDIS_DB_PASSWORD']
+    host: process.env.REDIS_DB_HOST,
+    port: process.env.REDIS_DB_PORT,
+    password: process.env.REDIS_DB_PASSWORD
   },
 
   host: process.env['OPENSHIFT_NODEJS_IP'],
