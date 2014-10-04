@@ -49,15 +49,18 @@ module.exports.http = {
 
     sessionBlocker: function (req, res, next) {
       var sessionMiddleware = sails.config.http.middleware.session;
+      var skipSessionMiddleware = false;
 
-      console.log(req.headers['user-agent']);
+      // Don't create sessions on HAProxy heartbeat requests
       if (req.headers['user-agent'] == null) {
-        console.log('skipping session middleware');
+        skipSessionMiddleware = true;
+      }
+
+      if (skipSessionMiddleware) {
         req.session = {};
         return next();
       }
 
-      console.log('creating session');
       return sessionMiddleware(req, res, next);
     }
   }
