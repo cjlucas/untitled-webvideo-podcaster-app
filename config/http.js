@@ -52,7 +52,7 @@ module.exports.http = {
 
       console.log(req.headers);
 
-      if (req.headers['user-agent'].match(/haproxy/i)) return next();
+      if (req.headers['user-agent'] == null) return next();
 
       return sessionMiddleware(req, res, next);
     }
