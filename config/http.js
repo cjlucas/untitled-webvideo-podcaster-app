@@ -21,43 +21,42 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
-  // middleware: {
+  middleware: {
 
-  /***************************************************************************
-  *                                                                          *
-  * The order in which middleware should be run for HTTP request. (the Sails *
-  * router is invoked by the "router" middleware below.)                     *
-  *                                                                          *
-  ***************************************************************************/
+    /***************************************************************************
+     *                                                                          *
+     * The order in which middleware should be run for HTTP request. (the Sails *
+     * router is invoked by the "router" middleware below.)                     *
+     *                                                                          *
+     ***************************************************************************/
 
-    // order: [
-    //   'startRequestTimer',
-    //   'cookieParser',
-    //   'session',
-    //   'myRequestLogger',
-    //   'bodyParser',
-    //   'handleBodyParserError',
-    //   'compress',
-    //   'methodOverride',
-    //   'poweredBy',
-    //   '$custom',
-    //   'router',
-    //   'www',
-    //   'favicon',
-    //   '404',
-    //   '500'
-    // ],
+    order: [
+      'startRequestTimer',
+      'cookieParser',
+      'sessionBlocker',
+      'bodyParser',
+      'handleBodyParserError',
+      'compress',
+      'methodOverride',
+      'poweredBy',
+      '$custom',
+      'router',
+      'www',
+      'favicon',
+      '404',
+      '500'
+    ],
 
-  /****************************************************************************
-  *                                                                           *
-  * Example custom middleware; logs each request to the console.              *
-  *                                                                           *
-  ****************************************************************************/
+    sessionBlocker: function (req, res, next) {
+      var sessionMiddleware = sails.config.http.middleware.session;
 
-    // myRequestLogger: function (req, res, next) {
-    //     console.log("Requested :: ", req.method, req.url);
-    //     return next();
-    // }
+      console.log(req.headers);
+
+      if (req.headers['user-agent'].match(/haproxy/i)) return next();
+
+      return sessionMiddleware(req, res, next);
+    }
+  }
 
 
   /***************************************************************************
