@@ -35,6 +35,7 @@ function addFeedMatcher(regex, feedIdIndex, site, feedType) {
 }
 
 addFeedMatcher(/youtube.com\/user\/(\w*)[\?\&]?/i, 1, 'youtube', 'channel');
+addFeedMatcher(/youtube.com\/playlist.*[\?\&]list\=([\w\-]*)[\?\&]?/i, 1, 'youtube', 'playlist');
 
 function findOrCreateFeed(criteria, callback) {
   Feed.findOne(criteria).exec(function(error, feed) {
@@ -68,24 +69,28 @@ function feedForUrl(url, callback) {
 }
 
 function urlForFeed(feed) {
-  if (feed.site === 'youtube' && feed.feedType === 'channel') {
-    return 'https://www.youtube.com/user/' +
-      feed.feedId + '/videos';
+  if (feed.site === 'youtube') {
+    switch (feed.feedType) {
+      case 'channel':
+        return 'https://www.youtube.com/user/' +
+          feed.feedId + '/videos';
+      case 'playlist':
+        return 'https://www.youtube.com/playlist?list=' + feed.feedId;
+      default:
+        break;
+    }
   }
 
-  throw new Error("Can't generate url for feed");
+  throw new Error("Can't generate url for feed: " + feed);
 }
 
 /**
  * Schema
  */
 
-var validSites = ['youtube'];
-var validFeedTypes = ['channel'];
-
 var FeedSchema = new Schema({
-  site: {type: String, enum: validSites, required: true},
-  feedType: {type: String, enum: validFeedTypes, required: true},
+  site: {type: String, required: true},
+  feedType: {type: String, required: true},
   feedId: {type: String, required: true},
   lastScannedAt: Date,
   videos: [{type: Schema.Types.ObjectId, ref: 'Video'}]
