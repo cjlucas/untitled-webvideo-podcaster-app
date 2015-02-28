@@ -1,5 +1,6 @@
-require 'sinatra/base'
 require 'mongo_mapper'
+require 'sinatra/base'
+require 'sidekiq'
 
 module VidFeeder
   class App < Sinatra::Application
@@ -12,7 +13,6 @@ module VidFeeder
   end
 end
 
+require_relative 'workers'
 require_relative 'models'
 require_relative 'routes'
-
-VidFeeder::App.run!

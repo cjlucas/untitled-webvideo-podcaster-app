@@ -1,0 +1,14 @@
+%form{action: '/add_feed', method: "POST"}
+  %input{type: 'text', name: 'url'}
+  %button{type: 'submit'} Add Feed
+
+%h1= "User has #{@feeds.size} feeds"
+%table
+  %tr
+    %th URL
+    %th Links
+  - @feeds.each do |feed|
+    %tr
+      %td= feed.site_id
+      %td
+        %a{href: "/update_feed/#{feed.id}"} Update

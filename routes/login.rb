@@ -1,5 +1,3 @@
-require 'sinatra/base'
-
 module VidFeeder
   class App < Sinatra::Application
     get '/register' do
@@ -7,7 +5,7 @@ module VidFeeder
     end
 
     get '/login' do
-      if session[:email].nil?
+      if user.nil?
         haml :login
       else
         redirect '/'
@@ -20,7 +18,7 @@ module VidFeeder
     end
 
     post '/login' do
-      if Models::User.is_valid_credentials?(params[:email], params[:password])
+      if User.is_valid_credentials?(params[:email], params[:password])
         session[:email] = params[:email]
         redirect '/'
       else
@@ -30,16 +28,8 @@ module VidFeeder
     end
 
     post '/create' do
-      puts Models::User.register!(params[:email], params[:password])
+      puts User.register!(params[:email], params[:password])
       redirect '/'
-    end
-
-    get '/' do
-      if session[:email].nil?
-        redirect '/login'
-      else
-        "You are #{session[:email]}"
-      end
     end
   end
 end
