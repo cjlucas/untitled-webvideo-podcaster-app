@@ -1,0 +1,16 @@
+!!! XML
+%rss{version: 2.0, 'xmlns:itunes' => 'http://www.itunes.com/dtds/podcast-1.0.dtd'}
+  %channel
+    %title= @feed.site_id
+    %link= @feed.url
+    %description Placeholder
+    - @feed.videos.each do |video|
+      %item
+        %pubDate= video.upload_date.rfc822
+        %title= video.title
+        -#%itunes:image{href: 'fdsa'}
+        %description= video.description
+        %itunes:summary= video.description
+        %enclosure
+          %url= url("/video/#{video.id}")
+          %type video/mp4

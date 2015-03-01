@@ -5,7 +5,7 @@ describe VidFeeder::Feed, '#from_url' do
     it 'should return a valid Feed' do
       feed = described_class.from_url('http://youtube.com/user/CannataJeff')
       expect(feed.site).to eql('youtube')
-      expect(feed.feed_id).to eql('CannataJeff')
+      expect(feed.site_id).to eql('CannataJeff')
       feed.save
     end
   end
@@ -14,6 +14,24 @@ describe VidFeeder::Feed, '#from_url' do
     it 'should return nil' do
       feed = described_class.from_url('http://fakesite.com/gibberish')
       expect(feed).to be_nil
+    end
+  end
+end
+
+describe VidFeeder::Feed, 'add_video' do
+  context 'when given a new video' do
+    before(:each) do
+      @f = described_class.new
+      @v = VidFeeder::Video.new
+      @f.add_video(@v)
+    end
+
+    it 'should be available in the videos array' do
+      expect(@f.videos.size).to eq(1)
+    end
+
+    it 'should be available to the video' do
+      expect(@v.feed).to eq(@f)
     end
   end
 end

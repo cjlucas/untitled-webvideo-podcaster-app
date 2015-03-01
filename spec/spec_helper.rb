@@ -4,8 +4,8 @@ require 'mongo_mapper'
 require_relative '../models'
 
 def destroy_all
-  VidFeeder::Models.constants.each do |model_name|
-    klass = VidFeeder::Models.const_get(model_name)
+  VidFeeder::constants.each do |model_name|
+    klass = VidFeeder.const_get(model_name)
     klass.destroy_all if klass.respond_to?(:destroy_all)
   end
 end
