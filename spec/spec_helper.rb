@@ -2,6 +2,7 @@ require 'rspec'
 require 'mongo_mapper'
 
 require_relative '../models'
+require_relative '../helpers'
 
 def destroy_all
   VidFeeder::constants.each do |model_name|

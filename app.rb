@@ -2,8 +2,12 @@ require 'mongo_mapper'
 require 'sinatra/base'
 require 'sidekiq'
 
+require_relative 'helpers'
+
 module VidFeeder
   class App < Sinatra::Application
+    include Helpers
+
     enable :sessions
 
     configure do
