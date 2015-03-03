@@ -28,10 +28,11 @@ describe VidFeeder::Feed, 'add_video' do
 
     it 'should be available in the videos array' do
       expect(@f.videos.size).to eq(1)
+      expect(@f.videos.first).to eq(@v)
     end
 
-    it 'should be available to the video' do
-      expect(@v.feed).to eq(@f)
+    it 'should store the site name of the feed' do
+      expect(@v.site).to eql(@f.site)
     end
   end
 end
