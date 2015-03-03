@@ -18,7 +18,8 @@ class FeedScraper
     until stdout.eof?
       line = stdout.readline
       line = JSON.parse(line)
-      block.call(video_for_json(line))
+      video = video_for_json(line)
+      block.call(video) unless video[:formats].empty?
     end
 
     vid_archive_fp.unlink
@@ -56,8 +57,11 @@ class FeedScraper
     out = []
 
     formats.each do |format|
-      # Filter audio formats
-      next if format['vcodec'].eql?('none')
+      # Filter audio/DASH formats
+      next if format['vcodec'].eql?('none') || format['acodec'].eql?('none')
+
+      # Filter 3D
+      next if format['format_node'].eql?('3D')
 
       out << format
     end
