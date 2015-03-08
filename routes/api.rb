@@ -13,6 +13,11 @@ module VidFeeder
       @json_body = JSON.parse(env['rack.input'].read)
     end
 
+    get '/api/feeds' do
+      validate_api_key!
+      json Feed.all.collect { |f| f.to_hash }
+    end
+
     get '/api/feed/:id/video_ids' do
       validate_api_key!
 
