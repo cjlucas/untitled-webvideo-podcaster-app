@@ -1,5 +1,7 @@
 module VidFeeder
   class App < Sinatra::Application
+    helpers Sinatra::JSON
+
     def validate_api_key!
       return if ENV['RACK_ENV'].eql?('development')
       key = env['HTTP_API_KEY']
@@ -18,8 +20,7 @@ module VidFeeder
       feed = Feed.find(feed_id)
       halt 404, "Feed with id #{feed_id} not found" if feed.nil?
 
-
-      JSON.dump(feed.videos.collect { |video| video.site_id})
+      json feed.videos.collect { |video| video.site_id }
     end
 
     put '/api/feed/:feed_id/videos' do
@@ -35,7 +36,7 @@ module VidFeeder
       memcache.delete(@feed.id.to_s) rescue nil
 
       if feed.save
-        feed.to_json
+        json feed.to_hash
       else
         halt 500, 'Error saving feed'
       end

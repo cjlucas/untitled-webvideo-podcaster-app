@@ -1,6 +1,7 @@
 require 'memcached'
 require 'mongo_mapper'
 require 'sinatra/base'
+require 'sinatra/json'
 require 'sidekiq'
 
 require_relative 'helpers'

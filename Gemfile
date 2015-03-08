@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'sinatra', github: 'sinatra/sinatra'
+gem 'sinatra-contrib'
 gem 'rake'
 gem 'mongo_mapper'
 gem 'bson_ext'
