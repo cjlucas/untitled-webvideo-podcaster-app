@@ -18,6 +18,7 @@
     <orderEntry type="library" scope="PROVIDED" name="hitimes (v1.2.2, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v0.7.0, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="json (v1.8.2, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="memcached (v1.8.0, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="minitest (v5.5.1, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mongo (v1.12.0, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mongo_mapper (v0.13.1, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
@@ -34,7 +35,7 @@
     <orderEntry type="library" scope="PROVIDED" name="rspec-mocks (v3.2.1, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-support (v3.2.2, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sidekiq (v3.3.2, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="sinatra (v1.4.5, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="sinatra (v1.4.5@be9c18, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="thread_safe (v0.3.4, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="tilt (v1.4.1, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="timers (v4.0.1, RVM: ruby-2.1.3 [vidfeeder]) [gem]" level="application" />

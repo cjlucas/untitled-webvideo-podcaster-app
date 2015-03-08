@@ -54,11 +54,16 @@ module VidFeeder
   class Video
     include MongoMapper::Document
 
+    before_save :ensure_upload_date_is_utc
+
     key :site, String
     key :site_id, String
     key :title, String
     key :upload_date, Time
     key :description, String
+    key :duration, Integer
+    key :image_url, String
+
 
     belongs_to :feed
     many :formats, class_name: 'VidFeeder::VideoFormat'
@@ -80,7 +85,7 @@ module VidFeeder
           nf.save
           formats << nf
         else
-          match.update_attributes(resolution: nf.resolution, url: nf.url)
+          match.update_attributes(resolution: nf.resolution, url: nf.url, size: nf.size)
           match.save
         end
       end
@@ -88,9 +93,10 @@ module VidFeeder
       save
     end
 
+    def ensure_upload_date_is_utc
+    end
+
     def url
-      puts 'jfodisajfiodas'
-      puts site
       case site
       when 'youtube'
         return "http://youtube.com/watch?v=#{site_id}"
@@ -118,6 +124,7 @@ module VidFeeder
 
     key :resolution, Integer
     key :url, String
+    key :size, Integer
 
     def ==(other)
       resolution == other.resolution

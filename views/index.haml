@@ -6,10 +6,12 @@
 %table
   %tr
     %th URL
+    %th Videos
     %th Links
   - @feeds.each do |feed|
     %tr
       %td= feed.site_id
+      %td= feed.videos.size
       %td
         %a{href: "/update_feed/#{feed.id}"} Update
         %a{href: "/feed/#{feed.id}"} RSS

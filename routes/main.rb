@@ -1,5 +1,14 @@
+require 'zlib'
+require 'stringio'
+
 module VidFeeder
   class App < Sinatra::Application
+    helpers do
+      def escape_html(text)
+        Rack::Utils.escape_html(text)
+      end
+    end
+
     def user
       return @user unless @user.nil?
       return nil if session[:email].nil?
@@ -38,25 +47,30 @@ module VidFeeder
       @feed = Feed.find(params[:id])
       halt 404, 'Feed not found' if @feed.nil?
 
-      haml :feed
+      key = @feed.id.to_s
+      data = memcache_load(key)
+      if data.nil?
+        data = haml :feed
+        memcache_save(key, data)
+      end
+      data
     end
 
     get '/video/:id' do
+      puts 'here'
       MAX_RETRIES = 10
       SLEEP_SECONDS = 1
 
       retry_count = 0
       dispatched_job = false
       ok = false
-      url = "http://localhost:4567/jvofjdioas"
       until retry_count == MAX_RETRIES
         video = Video.find(params[:id])
         halt 404, 'Video with id does not exist' if video.nil?
 
-        format = video.formats.detect { |f| f.resolution >= 720 }
-        halt 400, 'Video does not have a video with a resolution of over 720p' if format.nil?
+        format = best_format(video)
 
-        resp = fetch(URI(url))
+        resp = fetch(URI(format.url))
         if resp.is_a?(Net::HTTPOK) || resp.is_a?(Net::HTTPFound)
           ok = true
           break
@@ -81,15 +95,44 @@ module VidFeeder
 
     private
 
+    def memcache_load(key)
+      s = StringIO.new
+      begin
+        s.write(memcache.get(key))
+      rescue
+        return nil
+      end
+
+      s.rewind
+      data = nil
+      Zlib::GzipReader.wrap(s) do |gzip|
+        data = gzip.read
+        gzip.close
+      end
+
+      data
+    end
+
+    def memcache_save(key, data)
+      s = StringIO.new
+      Zlib::GzipWriter.wrap(s) do |gzip|
+        gzip.write(data)
+        gzip.finish
+      end
+
+      s.rewind
+      memcache.set(key, s.read)
+    end
+
     def fetch(uri)
       Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme.eql?('https')) do |http|
         resp = http.head("#{uri.path}?#{uri.query}") rescue nil
-        case resp
-        when Net::HTTPRedirection
-          fetch(URI(resp['location']))
-        else
-          return resp
-        end
+        return case resp
+               when Net::HTTPRedirection
+                 fetch(URI(resp['location']))
+               else
+                 resp
+               end
       end
     end
   end

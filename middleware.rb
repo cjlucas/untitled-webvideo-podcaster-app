@@ -1,0 +1,1 @@
+require_relative 'middleware/compress_response'

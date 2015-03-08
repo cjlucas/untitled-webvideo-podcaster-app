@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'sinatra'
+gem 'sinatra', github: 'sinatra/sinatra'
 gem 'rake'
 gem 'mongo_mapper'
 gem 'bson_ext'
@@ -10,3 +10,4 @@ gem 'rspec'
 gem 'rack-test'
 gem 'open4'
 gem 'sidekiq'
+gem 'memcached'

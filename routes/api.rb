@@ -32,7 +32,13 @@ module VidFeeder
 
       json_body['videos'].each { |video| feed.add_video(Video.new(video)) }
 
-      feed.save
+      memcache.delete(@feed.id.to_s) rescue nil
+
+      if feed.save
+        feed.to_json
+      else
+        halt 500, 'Error saving feed'
+      end
     end
 
     patch '/api/videos/:video_id' do

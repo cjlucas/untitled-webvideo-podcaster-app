@@ -16,5 +16,9 @@ module VidFeeder
       s += sprintf("%02d", seconds_left)
       s
     end
+
+    def best_format(video)
+      video.formats.sort{ |a,b| (b.resolution || 0) <=> (a.resolution || 0) }.first
+    end
   end
 end
