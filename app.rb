@@ -1,3 +1,4 @@
+require 'dotenv'
 require 'memcached'
 require 'mongo_mapper'
 require 'sinatra/base'
@@ -7,21 +8,26 @@ require 'sidekiq'
 require_relative 'helpers'
 require_relative 'middleware'
 
+Dotenv.load
+
 module VidFeeder
   class App < Sinatra::Application
     include Helpers
 
-    use CompressResponse
-
     enable :sessions
 
+    use CompressResponse
+
     configure do
-      MongoMapper.connection = Mongo::Connection.new('localhost', 27017)
-      MongoMapper.database = 'vidfeeder'
+      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i)
+      MongoMapper.database = ENV['MONGODB_DBNAME']
     end
 
     def memcache
-      @memcache ||= Memcached.new('localhost:11211', prefix_key: 'vidfeeder')
+      return @memcache unless @memcache.nil?
+
+      host_port = %Q{#{ENV['MEMCACHED_HOST']}:#{ENV['MEMCACHED_PORT']}}
+      @memcache = Memcached.new(host_port, prefix_key: ENV['MEMCACHED_PREFIX'])
     end
   end
 end

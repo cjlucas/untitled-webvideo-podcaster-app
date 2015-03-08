@@ -5,7 +5,7 @@ module VidFeeder
     def validate_api_key!
       return if ENV['RACK_ENV'].eql?('development')
       key = env['HTTP_API_KEY']
-      halt 403, 'Bad API key' if key.nil? || !key.eql?(ENV['VIDFEEDER_API_KEY'])
+      halt 403, 'Bad API key' if key.nil? || !key.eql?(ENV['API_KEY'])
     end
 
     def json_body
