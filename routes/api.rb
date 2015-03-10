@@ -38,7 +38,7 @@ module VidFeeder
 
       json_body['videos'].each { |video| feed.add_video(Video.new(video)) }
 
-      memcache.delete(@feed.id.to_s) rescue nil
+      memcache.delete(feed.id.to_s) rescue nil
 
       if feed.save
         json feed.to_hash
