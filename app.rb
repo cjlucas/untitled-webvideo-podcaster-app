@@ -19,7 +19,8 @@ module VidFeeder
     use CompressResponse
 
     configure do
-      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i)
+      logger = ENV['RACK_ENV'].eql?('development') ? Logger.new($stdout) : nil
+      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i, logger: logger)
       MongoMapper.database = ENV['MONGODB_DBNAME']
     end
 
