@@ -13,3 +13,4 @@ gem 'open4'
 gem 'sidekiq'
 gem 'memcached'
 gem 'dotenv'
+gem 'mechanize' # worker only

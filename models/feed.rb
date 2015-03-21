@@ -36,7 +36,8 @@ module VidFeeder
           id: id,
           site: site,
           site_id: site_id,
-          url: url
+          url: url,
+          image_url: image_url
       }
     end
 
@@ -53,8 +54,6 @@ module VidFeeder
 
   class Video
     include MongoMapper::Document
-
-    before_save :ensure_upload_date_is_utc
 
     key :site, String
     key :site_id, String
@@ -93,9 +92,6 @@ module VidFeeder
       save
     end
 
-    def ensure_upload_date_is_utc
-    end
-
     def url
       case site
       when 'youtube'
@@ -108,7 +104,7 @@ module VidFeeder
           id: id,
           site_id: site_id,
           description: description,
-          url: url
+          url: url,
       }
     end
 

@@ -3,6 +3,8 @@ require 'rspec/core/rake_task'
 require 'sidekiq/cli'
 require 'dotenv/tasks'
 
+require_relative 'workers'
+
 task :default => [:spec]
 
 task :spec do
@@ -39,6 +41,16 @@ task refresh_feeds: :environment do
     JSON.load(http.get(uri.path).body).each do |feed|
       id = feed['id']
       http.get(%Q{/update_feed/#{id}})
+    end
+  end
+end
+
+task add_missing_feed_images: :environment do
+  uri = URI(%Q{http://#{ENV['API_HOST']}:#{ENV['API_PORT']}/api/feeds})
+  Net::HTTP.start(uri.host, uri.port) do |http|
+    JSON.load(http.get(uri.path).body).each do |feed|
+      next unless feed['image_url'].nil?
+      VidFeeder::AddFeedImageWorker.perform_async(feed)
     end
   end
 end

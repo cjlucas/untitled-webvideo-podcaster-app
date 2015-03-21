@@ -15,7 +15,19 @@ module VidFeeder
 
     get '/api/feeds' do
       validate_api_key!
-      json Feed.all.collect { |f| f.to_hash }
+      json Feed.all.collect { |f| puts f.to_hash; f.to_hash }
+    end
+
+    patch '/api/feeds/:id' do
+      validate_api_key!
+
+      feed_id = params[:id]
+      feed = Feed.find(feed_id)
+      halt 404, "Feed with id #{feed_id} not found" if feed.nil?
+
+      feed.update_attributes(json_body)
+      feed.save
+      json feed.to_hash
     end
 
     get '/api/feed/:id/video_ids' do
