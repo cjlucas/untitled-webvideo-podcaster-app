@@ -21,7 +21,6 @@ class FeedScraper
         line = JSON.parse(line)
         video = video_for_json(line)
         unless video[:formats].empty?
-          set_format_sizes!(video)
           block.call(video)
         end
       end

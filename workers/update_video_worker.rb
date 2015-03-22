@@ -17,6 +17,7 @@ module VidFeeder
       puts video
       puts video['url']
       video = FeedScraper.fetch_video(video['url'])
+      FeedScraper.set_format_sizes!(video)
 
       Net::HTTP.start(uri.host, uri.port) do |http|
         req = Net::HTTP::Patch.new(uri.path)
