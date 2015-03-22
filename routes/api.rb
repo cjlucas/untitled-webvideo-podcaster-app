@@ -27,6 +27,9 @@ module VidFeeder
 
       feed.update_attributes(json_body)
       feed.save
+
+      cache.flush_feed(feed.id)
+
       json feed.to_hash
     end
 
@@ -50,7 +53,7 @@ module VidFeeder
 
       json_body['videos'].each { |video| feed.add_video(Video.new(video)) }
 
-      memcache.delete(feed.id.to_s) rescue nil
+      cache.flush_feed(feed.id)
 
       if feed.save
         json feed.to_hash

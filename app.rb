@@ -5,6 +5,7 @@ require 'sinatra/base'
 require 'sinatra/json'
 require 'sidekiq'
 
+require_relative 'cache_store'
 require_relative 'helpers'
 require_relative 'middleware'
 
@@ -18,17 +19,27 @@ module VidFeeder
 
     use CompressResponse
 
-    configure do
-      logger = ENV['RACK_ENV'].eql?('development') ? Logger.new($stdout) : nil
-      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i, logger: logger)
-      MongoMapper.database = ENV['MONGODB_DBNAME']
+    def self.logger
+      development? ? Logger.new($stdout) : nil
     end
 
-    def memcache
-      return @memcache unless @memcache.nil?
+    def self.cache
+      CacheStore.new(host: ENV['CACHE_HOST'],
+                     port: ENV['CACHE_PORT'],
+                     db: 0,
+                     prefix: 'vidfeeder_cache',
+                     enabled: ENV['CACHE_ENABLED'].eql?('true'),
+                     logger: logger)
+    end
 
-      host_port = %Q{#{ENV['MEMCACHED_HOST']}:#{ENV['MEMCACHED_PORT']}}
-      @memcache = Memcached.new(host_port, prefix_key: ENV['MEMCACHED_PREFIX'])
+    configure do
+      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i, logger: nil)
+      MongoMapper.database = ENV['MONGODB_DBNAME']
+      cache.flush!
+    end
+
+    def cache
+      @cache ||= self.class.cache
     end
   end
 end

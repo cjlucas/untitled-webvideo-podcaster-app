@@ -47,14 +47,15 @@ module VidFeeder
     end
 
     get '/feed/:id' do
+      content_type :rss
+
       @feed = Feed.find(params[:id])
       halt 404, 'Feed not found' if @feed.nil?
 
-      key = @feed.id.to_s
-      data = memcache_load(key)
+      data = cache.load_feed(@feed.id)
       if data.nil?
         data = haml :feed
-        memcache_save(key, data)
+        cache.save_feed(@feed.id, data)
       end
       data
     end
@@ -97,35 +98,6 @@ module VidFeeder
     end
 
     private
-
-    def memcache_load(key)
-      s = StringIO.new
-      begin
-        s.write(memcache.get(key))
-      rescue
-        return nil
-      end
-
-      s.rewind
-      data = nil
-      Zlib::GzipReader.wrap(s) do |gzip|
-        data = gzip.read
-        gzip.close
-      end
-
-      data
-    end
-
-    def memcache_save(key, data)
-      s = StringIO.new
-      Zlib::GzipWriter.wrap(s) do |gzip|
-        gzip.write(data)
-        gzip.finish
-      end
-
-      s.rewind
-      memcache.set(key, s.read)
-    end
 
     def fetch(uri)
       Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme.eql?('https')) do |http|
