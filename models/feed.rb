@@ -5,6 +5,7 @@ module VidFeeder
     key :site, String
     key :site_id, String
     key :video_ids, Array
+    key :image_url, String
 
     many :videos, in: :video_ids, class_name: 'VidFeeder::Video'
 

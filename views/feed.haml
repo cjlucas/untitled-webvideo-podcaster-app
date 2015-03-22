@@ -5,7 +5,9 @@
     %title= @feed.site_id
     %link= @feed.url
     %description Placeholder
-    %image= @feed.image_url
+    - unless @feed.image_url.nil?
+      %image= @feed.image_url
+      %itunes:image{href:  @feed.image_url}
     - @feed.videos.sort{ |a,b| b.upload_date <=> a.upload_date }.each do |video|
       %item
         %guid= video.id

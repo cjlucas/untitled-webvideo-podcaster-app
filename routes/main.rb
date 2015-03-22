@@ -33,6 +33,9 @@ module VidFeeder
       user.feeds << feed
       user.save
 
+      FetchVideosWorker.perform_async(feed.to_hash)
+      AddFeedImageWorker.perform_async(feed.to_hash)
+
       redirect '/'
     end
 
