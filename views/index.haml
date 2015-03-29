@@ -11,7 +11,7 @@
   - @feeds.each do |feed|
     %tr
       %td= feed.site_id
-      %td= feed.videos.size
+      %td= feed.video_ids.size
       %td
         %a{href: "/update_feed/#{feed.id}"} Update
         %a{href: "/feed/#{feed.id}"} RSS
