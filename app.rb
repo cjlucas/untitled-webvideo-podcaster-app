@@ -20,7 +20,7 @@ module VidFeeder
     use CompressResponse
 
     def self.logger
-      development? ? Logger.new($stdout) : nil
+      Logger.new($stdout)
     end
 
     def self.cache
