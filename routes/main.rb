@@ -61,7 +61,6 @@ module VidFeeder
     end
 
     get '/video/:id' do
-      puts 'here'
       MAX_RETRIES = 10
       SLEEP_SECONDS = 1
 
