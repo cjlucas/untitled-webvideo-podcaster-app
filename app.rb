@@ -33,7 +33,7 @@ module VidFeeder
     end
 
     configure do
-      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i, logger: nil)
+      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i, logger: self.logger)
       MongoMapper.database = ENV['MONGODB_DBNAME']
       cache.flush!
     end
