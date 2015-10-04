@@ -87,7 +87,6 @@ module VidFeeder
 
         retry_count += 1
         sleep SLEEP_SECONDS
-        url = format.url
       end
 
       if ok
@@ -100,7 +99,9 @@ module VidFeeder
     private
 
     def fetch(uri)
-      Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme.eql?('https')) do |http|
+      Net::HTTP.start(uri.host, uri.port,
+                      use_ssl: uri.scheme.eql?('https'),
+                      verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
         resp = http.head("#{uri.path}?#{uri.query}") rescue nil
         return case resp
                when Net::HTTPRedirection
