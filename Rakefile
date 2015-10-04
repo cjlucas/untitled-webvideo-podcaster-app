@@ -28,7 +28,7 @@ task s: :server
 
 task work: :environment do
   cli = Sidekiq::CLI.instance
-  cli.parse(['-r', './workers.rb'])
+  cli.parse(['-r', './workers.rb', '-c', '1'])
   cli.run
 end
 
@@ -52,5 +52,15 @@ task add_missing_feed_images: :environment do
       next unless feed['image_url'].nil?
       VidFeeder::AddFeedImageWorker.perform_async(feed)
     end
+  end
+end
+
+task :run do
+  loop do
+    puts 'before invoke'
+    Rake::Task['refresh_feeds'].invoke
+    puts 'after invoke'
+    sleep(60 * 60 * 6)
+    puts 'after sleep'
   end
 end
