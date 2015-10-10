@@ -4,17 +4,19 @@ module VidFeeder
 
     key :site, String
     key :site_id, String
+    key :feed_type, String, default: 'user'
     key :video_ids, Array
     key :image_url, String
 
     many :videos, in: :video_ids, class_name: 'VidFeeder::Video'
 
     def self.from_url(url)
+        puts url
       feed = case url
              when /(https?\:\/\/)?youtube.com\/user\/([^\/]*)/i
-               new_with_data('youtube', $2)
-             else
-               nil
+               new_with_data('youtube', 'user', $2)
+             when /(https?\:\/\/)?(w{3}\.)?youtube.com\/playlist\?list\=([^\/]*)/i
+                 new_with_data('youtube', 'playlist', $3)
              end
 
       feed.save unless feed.nil?
@@ -27,9 +29,15 @@ module VidFeeder
     end
 
     def url
-      if site.eql?('youtube')
-        return "http://youtube.com/user/#{site_id}"
-      end
+        case site
+        when 'youtube'
+            case feed_type
+            when 'user'
+                "http://youtube.com/user/#{site_id}"
+            when 'playlist'
+                "https://www.youtube.com/playlist?list=#{site_id}"
+            end
+        end
     end
 
     def to_hash
@@ -37,6 +45,7 @@ module VidFeeder
           id: id,
           site: site,
           site_id: site_id,
+          feed_type: feed_type,
           url: url,
           image_url: image_url
       }
@@ -48,8 +57,8 @@ module VidFeeder
 
     private
 
-    def self.new_with_data(site, site_id)
-      find_or_initialize_by_site_and_site_id(site, site_id)
+    def self.new_with_data(site, feed_type, site_id)
+      find_or_initialize_by_site_and_feed_type_and_site_id(site, feed_type, site_id)
     end
   end
 
