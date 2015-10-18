@@ -16,6 +16,6 @@
         - unless video.image_url.nil?
           %itunes:image{href: video.image_url}
         %itunes:duration= fmt_duration(video.duration)
-        %description= escape_html(video.description)
+        %description= escape_html(prettify_video_desc(video.description))
         %itunes:summary= escape_html(video.description)
         %enclosure{url: url("/video/#{video.id}"), length: best_format(video).size, type: 'video/mp4'}

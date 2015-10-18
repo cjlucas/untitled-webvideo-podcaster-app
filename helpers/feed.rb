@@ -20,5 +20,17 @@ module VidFeeder
     def best_format(video)
       video.formats.sort{ |a,b| (b.resolution || 0) <=> (a.resolution || 0) }.first
     end
+
+    def prettify_video_desc(desc)
+      desc.gsub!(/\n/, ' <br> ')
+
+      pretty_desc = []
+      desc.split(/\s/).each do |s|
+        s = %Q{<a href="#{s}">#{s}</a>} if /https?:\/\/\S*/i =~ s
+        pretty_desc << s
+      end
+
+      pretty_desc.join(' ')
+    end
   end
 end
