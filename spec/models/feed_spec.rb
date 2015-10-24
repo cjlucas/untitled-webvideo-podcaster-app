@@ -10,6 +10,15 @@ describe VidFeeder::Feed, '#from_url' do
     end
   end
 
+  context 'when given a youtube playlist url' do
+    it 'should return a valid Feed' do
+      feed = described_class.from_url('https://www.youtube.com/playlist?list=PLDWZ5uzn69ezRJYeWxYNRMYebvf8DerHd')
+      expect(feed.site).to eql('youtube')
+      expect(feed.site_id).to eql('PLDWZ5uzn69ezRJYeWxYNRMYebvf8DerHd')
+      feed.save
+    end
+  end
+
   context 'when given an unsupported url' do
     it 'should return nil' do
       feed = described_class.from_url('http://fakesite.com/gibberish')
