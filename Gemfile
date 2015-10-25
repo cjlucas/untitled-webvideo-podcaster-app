@@ -11,7 +11,6 @@ gem 'rspec'
 gem 'rack-test'
 gem 'open4'
 gem 'sidekiq'
-gem 'memcached'
 gem 'dotenv'
 gem 'mechanize' # worker only
 gem 'hiredis'
