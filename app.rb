@@ -1,5 +1,4 @@
 require 'dotenv'
-require 'memcached'
 require 'mongo_mapper'
 require 'sinatra/base'
 require 'sinatra/json'
