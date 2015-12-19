@@ -12,7 +12,7 @@ module VidFeeder
     sidekiq_options retry: 2
 
     def perform(video)
-      uri = URI("http://localhost:4567/api/videos/#{video['id']}")
+      uri = URI("http://#{ENV['API_HOST']}:#{ENV['API_PORT']}/api/videos/#{video['id']}")
       puts uri
       puts video
       puts video['url']

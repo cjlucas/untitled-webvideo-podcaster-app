@@ -17,7 +17,7 @@ module VidFeeder
       raise Exception, '<img> element has no src attribute' if image_url.nil?
 
       id = feed['id']
-      uri = URI("http://localhost:4567/api/feeds/#{id}")
+      uri = URI("http://#{ENV['API_HOST']}:#{ENV['API_PORT']}/api/feeds/#{id}")
       Net::HTTP.start(uri.host, uri.port) do |http|
         req = Net::HTTP::Patch.new(uri.path)
         req.content_type = 'application/json'

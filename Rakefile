@@ -27,6 +27,9 @@ end
 task s: :server
 
 task work: :environment do
+  REDIS_URL = "redis://#{ENV['CACHE_HOST']}:#{ENV['CACHE_PORT']}/0"
+  Sidekiq.configure_server { |config| config.redis = { url: REDIS_URL } }
+  Sidekiq.configure_client { |config| config.redis = { url: REDIS_URL } }
   cli = Sidekiq::CLI.instance
   cli.parse(['-r', './workers.rb', '-c', '1'])
   cli.run
@@ -37,9 +40,11 @@ require 'uri'
 
 task refresh_feeds: :environment do
   uri = URI(%Q{http://#{ENV['API_HOST']}:#{ENV['API_PORT']}/api/feeds})
+  puts uri
   Net::HTTP.start(uri.host, uri.port) do |http|
     JSON.load(http.get(uri.path).body).each do |feed|
       id = feed['id']
+      puts id
       http.get(%Q{/update_feed/#{id}})
     end
   end
@@ -55,12 +60,9 @@ task add_missing_feed_images: :environment do
   end
 end
 
-task :run do
+task :run_worker do
   loop do
-    puts 'before invoke'
-    Rake::Task['refresh_feeds'].invoke
-    puts 'after invoke'
-    sleep(60 * 60 * 6)
-    puts 'after sleep'
+    Rake::Task['refresh_feeds'].execute
+    # sleep(60 * 60 * 2)
   end
 end

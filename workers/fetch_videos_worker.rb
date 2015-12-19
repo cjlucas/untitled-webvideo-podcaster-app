@@ -5,7 +5,6 @@ require 'uri'
 
 require_relative 'youtubedl'
 
-
 module VidFeeder
   class FetchVideosWorker
     include Sidekiq::Worker
@@ -23,10 +22,11 @@ module VidFeeder
     end
 
     def perform(feed)
+      puts "WEEE"
       start_format_size_workers
 
       id = feed['id']
-      uri = URI("http://localhost:4567/api/feed/#{id}/videos")
+      uri = URI("http://#{ENV['API_HOST']}:#{ENV['API_PORT']}/api/feed/#{id}/videos")
 
       FeedScraper.scrape(feed['url'], feed['site'], existing_videos(id)) do |video|
         @video_count += 1
@@ -56,7 +56,7 @@ module VidFeeder
     private
 
     def existing_videos(id)
-      uri = URI("http://localhost:4567/api/feed/#{id}/video_ids")
+      uri = URI("http://#{ENV['API_HOST']}:#{ENV['API_PORT']}/api/feed/#{id}/video_ids")
       body = Net::HTTP.get(uri)
       JSON.parse(body)
     end
