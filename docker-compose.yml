@@ -1,7 +1,7 @@
 web:
     build: .
     ports:
-        - "80:80"
+        - "4567:80"
     links:
         - db
         - redis-server
