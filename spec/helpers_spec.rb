@@ -17,7 +17,7 @@ describe VidFeeder::Helpers, '#prettify_video_desc' do
   let(:dummy_class) { Class.new { extend VidFeeder::Helpers } }
 
   it 'should prettify the video description' do
-    expect(dummy_class.prettify_video_desc("\n")).to eql("<br>")
+    expect(dummy_class.prettify_video_desc("\n")).to eql(" <br>")
     expect(dummy_class.prettify_video_desc("http://google.com/something?args=val")).to eql(%q{<a href="http://google.com/something?args=val">http://google.com/something?args=val</a>})
   end
 end

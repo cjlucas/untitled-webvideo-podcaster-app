@@ -11,12 +11,13 @@ module VidFeeder
     many :videos, in: :video_ids, class_name: 'VidFeeder::Video'
 
     def self.from_url(url)
-        puts url
       feed = case url
              when /(https?\:\/\/)?youtube.com\/user\/([^\/]*)/i
                new_with_data('youtube', 'user', $2)
              when /(https?\:\/\/)?(w{3}\.)?youtube.com\/playlist\?list\=([^\/]*)/i
-                 new_with_data('youtube', 'playlist', $3)
+               new_with_data('youtube', 'playlist', $3)
+             when /(https?\:\/\/)?(w{3}\.)?youtube.com\/channel\/([^\/]*)/i
+               new_with_data('youtube', 'playlist', $3)
              end
 
       feed.save unless feed.nil?

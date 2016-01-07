@@ -4,6 +4,7 @@ describe VidFeeder::Feed, '#from_url' do
   context 'when given a youtube user url' do
     it 'should return a valid Feed' do
       feed = described_class.from_url('http://youtube.com/user/CannataJeff')
+      expect(feed).not_to be_nil
       expect(feed.site).to eql('youtube')
       expect(feed.site_id).to eql('CannataJeff')
       feed.save
@@ -13,8 +14,19 @@ describe VidFeeder::Feed, '#from_url' do
   context 'when given a youtube playlist url' do
     it 'should return a valid Feed' do
       feed = described_class.from_url('https://www.youtube.com/playlist?list=PLDWZ5uzn69ezRJYeWxYNRMYebvf8DerHd')
+      expect(feed).not_to be_nil
       expect(feed.site).to eql('youtube')
       expect(feed.site_id).to eql('PLDWZ5uzn69ezRJYeWxYNRMYebvf8DerHd')
+      feed.save
+    end
+  end
+
+  context 'when given a youtube channel url' do
+    it 'should return a valid Feed' do
+      feed = described_class.from_url('https://www.youtube.com/channel/UCVHdvAX5-R8y5l9xp6nroBQ')
+      expect(feed).not_to be_nil
+      expect(feed.site).to eql('youtube')
+      expect(feed.site_id).to eql('UCVHdvAX5-R8y5l9xp6nroBQ')
       feed.save
     end
   end
