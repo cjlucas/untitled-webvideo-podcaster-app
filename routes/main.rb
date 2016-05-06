@@ -49,13 +49,13 @@ module VidFeeder
     get '/feed/:id' do
       content_type :rss
 
-      @feed = Feed.find(params[:id])
-      halt 404, 'Feed not found' if @feed.nil?
+      feed = Feed.find(params[:id])
+      halt 404, 'Feed not found' if feed.nil?
 
-      data = cache.load_feed(@feed.id)
+      data = cache.load_feed(feed.id)
       if data.nil?
-        data = haml :feed, locals: {feed: @feed}
-        cache.save_feed(@feed.id, data)
+        data = haml :feed, locals: {feed: feed}
+        cache.save_feed(feed.id, data)
       end
       data
     end
