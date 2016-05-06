@@ -2,13 +2,13 @@
 !!!
 %rss{version: 2.0, 'xmlns:itunes' => 'http://www.itunes.com/dtds/podcast-1.0.dtd'}
   %channel
-    %title= @feed.site_id
-    %link= @feed.url
+    %title= feed.site_id
+    %link= feed.url
     %description Placeholder
-    - unless @feed.image_url.nil?
-      %image= @feed.image_url
-      %itunes:image{href:  @feed.image_url}
-    - @feed.videos.sort{ |a,b| b.upload_date <=> a.upload_date }.each do |video|
+    - unless feed.image_url.nil?
+      %image= feed.image_url
+      %itunes:image{href:  feed.image_url}
+    - feed.videos.sort{ |a,b| b.upload_date <=> a.upload_date }.each do |video|
       %item
         %guid= video.id
         %pubDate= video.upload_date.rfc822

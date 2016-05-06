@@ -54,7 +54,7 @@ module VidFeeder
 
       data = cache.load_feed(@feed.id)
       if data.nil?
-        data = haml :feed
+        data = haml :feed, locals: {feed: @feed}
         cache.save_feed(@feed.id, data)
       end
       data

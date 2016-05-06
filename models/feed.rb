@@ -17,7 +17,7 @@ module VidFeeder
              when /(https?\:\/\/)?(w{3}\.)?youtube.com\/playlist\?list\=([^\/]*)/i
                new_with_data('youtube', 'playlist', $3)
              when /(https?\:\/\/)?(w{3}\.)?youtube.com\/channel\/([^\/]*)/i
-               new_with_data('youtube', 'playlist', $3)
+               new_with_data('youtube', 'channel', $3)
              end
 
       feed.save unless feed.nil?
