@@ -15,8 +15,7 @@ class FeedScraper
 
     archive_path = existing_videos.empty? ? nil : vid_archive_fp.path
 
-    puts "DOIN IT"
-    status = Open4::popen4(cmd(url, archive_path)) do |pid, stdin, stdout, stderr|
+    Open4::popen4(cmd(url, archive_path)) do |pid, stdin, stdout, stderr|
       until stdout.eof?
         line = stdout.readline
         line = JSON.parse(line)
@@ -26,8 +25,6 @@ class FeedScraper
         end
       end
     end
-
-    puts status.exitstatus
 
     vid_archive_fp.unlink
     # raise ScraperException, stderr.read unless stderr.eof?

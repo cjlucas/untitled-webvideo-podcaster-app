@@ -61,10 +61,6 @@ class CompressResponse
     @env = env
     @status, @headers, @response = @app.call(@env)
 
-    @env.each do |key, value|
-      puts [key, value].to_s if key =~ /^HTTP\_/
-    end
-
     if @env['REQUEST_METHOD'] =~ /GET/
       compress_response if supported_content_type? && accepts_compression?
 

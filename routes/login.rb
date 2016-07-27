@@ -28,7 +28,7 @@ module VidFeeder
     end
 
     post '/create' do
-      puts User.register!(params[:email], params[:password])
+      User.register!(params[:email], params[:password])
       redirect '/'
     end
   end

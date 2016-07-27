@@ -13,9 +13,6 @@ module VidFeeder
 
     def perform(video)
       uri = URI("http://#{ENV['API_HOST']}:#{ENV['API_PORT']}/api/videos/#{video['id']}")
-      puts uri
-      puts video
-      puts video['url']
       video = FeedScraper.fetch_video(video['url'])
       FeedScraper.set_format_sizes!(video)
 

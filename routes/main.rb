@@ -18,10 +18,7 @@ module VidFeeder
     get '/' do
       redirect '/login' if user.nil?
 
-      puts 'here'
       @feeds = user.feeds
-      puts 'here2'
-
       haml :index
     end
 

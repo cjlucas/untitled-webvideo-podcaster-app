@@ -15,7 +15,7 @@ module VidFeeder
 
     get '/api/feeds' do
       validate_api_key!
-      json Feed.all.collect { |f| puts f.to_hash; f.to_hash }
+      json Feed.all.collect { |f| f.to_hash }
     end
 
     patch '/api/feeds/:id' do

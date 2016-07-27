@@ -22,7 +22,6 @@ module VidFeeder
     end
 
     def perform(feed)
-      puts "WEEE"
       start_format_size_workers
 
       id = feed['id']
