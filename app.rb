@@ -26,6 +26,7 @@ module VidFeeder
     include Helpers
 
     enable :sessions
+    set :session_secret, 'abc'
 
     use CompressResponse
 
@@ -43,7 +44,7 @@ module VidFeeder
     end
 
     configure do
-      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i, logger: self.logger)
+      MongoMapper.connection = Mongo::Connection.new(ENV['MONGODB_HOST'], ENV['MONGODB_PORT'].to_i, logger: nil)
       MongoMapper.database = ENV['MONGODB_DBNAME']
       cache.flush!
     end
