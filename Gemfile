@@ -11,6 +11,7 @@ gem 'open4'
 gem 'sidekiq'
 gem 'dotenv'
 gem 'hiredis'
+gem 'unicorn'
 
 group :test do
   gem 'rspec'
