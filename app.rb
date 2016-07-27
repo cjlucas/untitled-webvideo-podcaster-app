@@ -3,6 +3,7 @@ require 'mongo_mapper'
 require 'sinatra/base'
 require 'sinatra/json'
 require 'sidekiq'
+require 'active_model/serializers'
 
 require_relative 'cache_store'
 require_relative 'helpers'
