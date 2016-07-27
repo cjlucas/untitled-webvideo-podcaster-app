@@ -7,6 +7,7 @@ module VidFeeder
     key :feed_type, String, default: 'user'
     key :video_ids, Array
     key :image_url, String
+    timestamps!
 
     many :videos, in: :video_ids, class_name: 'VidFeeder::Video'
 
