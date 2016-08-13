@@ -49,7 +49,7 @@ module VidFeeder
       feed = Feed.find(params[:id])
       halt 404, 'Feed not found' if feed.nil?
       unless feed.updated_at.nil?
-        response['Last-Modified'] = feed.updated_at.utc.strftime('%a, %-d %b %Y %T %Z')
+        response['Last-Modified'] = feed.updated_at.utc.httpdate
       end
 
       data = cache.load_feed(feed.id)
