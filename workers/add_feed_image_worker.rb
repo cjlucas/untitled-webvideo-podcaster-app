@@ -16,6 +16,9 @@ module VidFeeder
       image_url = img.attr('src')
       raise Exception, '<img> element has no src attribute' if image_url.nil?
 
+      # set resolution of image to 1600x1600
+      image_url.sub!(/\/s\d+\-/, '/s1600-')
+
       id = feed['id']
       uri = URI("http://#{ENV['API_HOST']}:#{ENV['API_PORT']}/api/feeds/#{id}")
       Net::HTTP.start(uri.host, uri.port) do |http|
