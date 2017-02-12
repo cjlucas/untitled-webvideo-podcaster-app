@@ -38,6 +38,8 @@ module VidFeeder
                 "http://youtube.com/user/#{site_id}"
             when 'playlist'
                 "https://www.youtube.com/playlist?list=#{site_id}"
+            when 'channel'
+                "https://www.youtube.com/channel/#{site_id}"
             end
         end
     end
