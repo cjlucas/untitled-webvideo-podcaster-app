@@ -65,7 +65,12 @@ module VidFeeder
         thr = Thread.new do
           loop do
             v = @pending_vid_q.pop
-            FeedScraper.set_format_sizes!(v)
+            begin
+              FeedScraper.set_format_sizes!(v)
+            rescue
+              puts "Failed to set format sizes for #{v}"
+            end
+
             @processed_vid_q << v
           end
         end
