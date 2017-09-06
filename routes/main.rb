@@ -61,38 +61,12 @@ module VidFeeder
     end
 
     get '/video/:id' do
-      MAX_RETRIES = 10
-      SLEEP_SECONDS = 1
-
-      retry_count = 0
-      dispatched_job = false
-      ok = false
-      until retry_count == MAX_RETRIES
         video = Video.find(params[:id])
         halt 404, 'Video with id does not exist' if video.nil?
 
-        format = best_format(video)
+        site_url = "https://www.youtube.com/watch?v=#{video.site_id}"
 
-        resp = fetch(URI(format.url))
-        if resp.is_a?(Net::HTTPOK) || resp.is_a?(Net::HTTPFound)
-          ok = true
-          break
-        end
-
-        unless dispatched_job
-          UpdateVideoWorker.perform_async(video.to_hash)
-          dispatched_job = true
-        end
-
-        retry_count += 1
-        sleep SLEEP_SECONDS
-      end
-
-      if ok
-        redirect format.url
-      else
-        halt 500, 'Could not get valid URL for video'
-      end
+        redirect "https://xzsc1ifa0m.execute-api.us-east-1.amazonaws.com/beta?url=#{site_url}"
     end
 
     private
